@@ -1,5 +1,5 @@
 COUNTRY_CHOICES = [
-    ('KG', 'Kyrgyzatan'),
+    ('KG', 'Kyrgyzstan'),
     ('KZ', 'Kazakhstan'),
     ('RU', 'Russia'),
     ('UZ', 'Uzbekistan'),

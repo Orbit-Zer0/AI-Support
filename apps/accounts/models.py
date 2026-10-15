@@ -4,20 +4,46 @@ from django.db import models
 from .countries import COUNTRY_CHOICES
 
 
+class Language(models.Model):
+    code = models.CharField(max_length=5, primary_key=True)
+    name = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.name} ({self.code})'
+
+
+class Country(models.Model):
+    code = models.CharField(max_length=2, primary_key=True)
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = 'countries'
+        ordering = ['name']
+
+    def __str__(self):
+        return f'{self.name} ({self.code})'
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='profile',
     )
-    # Код страны по ISO 3166-1. Допустимые значения задаёт countries.py.
     country = models.CharField(
-        max_length=2,
-        choices=COUNTRY_CHOICES,
-        blank=True,
-        default='',
+        max_length=2, choices=COUNTRY_CHOICES, blank=True, default=''
+    )
+    country_ref = models.ForeignKey(
+        Country, null=True, blank=True,
+        on_delete=models.PROTECT, related_name='profiles',
+    )
+    language = models.ForeignKey(
+        Language, null=True, blank=True,
+        on_delete=models.PROTECT, related_name='profiles',
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.user.username} ({self.country or "страна не указана"})'
+        return f'{self.user.username}'
