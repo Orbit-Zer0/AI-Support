@@ -1,9 +1,6 @@
 from django.conf import settings
 from django.db import models
 
-from .countries import COUNTRY_CHOICES
-
-
 class Language(models.Model):
     code = models.CharField(max_length=5, primary_key=True)
     name = models.CharField(max_length=50)
@@ -32,10 +29,7 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='profile',
     )
-    country = models.CharField(
-        max_length=2, choices=COUNTRY_CHOICES, blank=True, default=''
-    )
-    country_ref = models.ForeignKey(
+    country = models.ForeignKey(
         Country, null=True, blank=True,
         on_delete=models.PROTECT, related_name='profiles',
     )

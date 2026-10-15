@@ -20,7 +20,8 @@ class RegisterView(APIView):
             {
                 'token': token.key,
                 'username': user.username,
-                'country': user.profile.country,
+                'country': user.profile.country_id,
+                'language': user.profile.language_id,
             },
             status=201,
         )
@@ -34,5 +35,12 @@ class LoginView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, _ = Token.objects.get_or_create(user=user)
-        country = getattr(getattr(user, 'profile', None), 'country', '')
-        return Response({'token': token.key, 'username': user.username, 'country': country})
+        profile = getattr(user, 'profile', None)
+        return Response(
+            {
+                'token': token.key,
+                'username': user.username,
+                'country': profile.country_id if profile else None,
+                'language': profile.language_id if profile else None,
+            }
+        )
