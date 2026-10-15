@@ -3,14 +3,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 from rest_framework import serializers
 
+from .countries import ALLOWED_COUNTRIES
 from .models import UserProfile
 
 User = get_user_model()
-
-ALLOWED_COUNTRIES = {
-    'KG', 'KZ', 'RU', 'UZ', 'TJ', 'TM',
-    'AZ', 'AM', 'GE', 'BY', 'MD', 'UA',
-}
 
 
 class RegisterSerializer(serializers.Serializer):

@@ -7,6 +7,10 @@ from rest_framework.response import Response
 from .models import Conversation, Message
 from .services import get_ai_response
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -34,6 +38,7 @@ def chat_view(request):
         ai_response = get_ai_response(history, user_message)
     except genai_errors.APIError as e:
         status = 429 if e.code == 429 else 503
+        logger.error("Gemini API error: %s %s", e.code, e)
         return Response(
             {'error': 'Сервис ИИ временно недоступен, попробуйте позже.'},
             status=status,
