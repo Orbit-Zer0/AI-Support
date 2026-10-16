@@ -35,7 +35,7 @@ def chat_view(request):
         history = []
 
     try:
-        ai_response = get_ai_response(history, user_message)
+        ai_response = get_ai_response(history, user_message, request.user)
     except genai_errors.APIError as e:
         status = 429 if e.code == 429 else 503
         logger.error("Gemini API error: %s %s", e.code, e)
