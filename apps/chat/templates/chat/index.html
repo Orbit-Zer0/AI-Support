@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Support</title>
+  <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>AI Support</h1>
+    </header>
+
+    <main class="messages" id="messages">
+      <div class="message message-bot">Привет! Я ИИ-помощник для эмоциональной поддержки.</div>
+      <div class="message message-user">Привет!</div>
+    </main>
+
+    <footer class="composer">
+      <textarea id="input" rows="1" placeholder="Напиши сообщение..."></textarea>
+      <button type="button" id="send">Отправить</button>
+    </footer>
+  </div>
+</body>
+</html>
