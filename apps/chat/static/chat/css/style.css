@@ -229,3 +229,37 @@ body {
 
 .composer textarea { max-height: 160px; }
 .composer button:disabled { opacity: 0.6; cursor: wait; }
+.composer { align-items: flex-end; }
+.composer textarea { min-height: 44px; line-height: 1.4; }
+.composer button { height: 44px; flex-shrink: 0; }
+
+.outgoing {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  max-width: 80%;
+}
+
+.outgoing .message-user { max-width: 100%; }
+
+.message-user.is-pending { opacity: 0.6; }
+
+.message-user.is-failed {
+  color: var(--text);
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+
+.message-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--error);
+}
+
+.message-status .link-button:disabled { opacity: 0.5; cursor: not-allowed; }

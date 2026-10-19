@@ -10,6 +10,7 @@ let optionsLoaded = false;
 let conversationId = null;
 let sending = false;
 
+let chatEpoch = 0;
 
 async function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
@@ -67,14 +68,12 @@ function makeCountryLabeler() {
   try {
     names = new Intl.DisplayNames([currentLang], { type: 'region' });
   } catch (error) {
-    
   }
   return (item) => {
     try {
       const label = names && names.of(item.code);
       if (label && label !== item.code) return label;
     } catch (error) {
-      
     }
     return item.name;
   };
@@ -202,7 +201,6 @@ function clearSession() {
   localStorage.removeItem(USERNAME_KEY);
 }
 
-
 const PURIFY_CONFIG = {
   ALLOWED_TAGS: [
     'p', 'br', 'hr', 'strong', 'em', 'b', 'i', 'del', 'code', 'pre',
@@ -240,24 +238,24 @@ function scrollToBottom() {
 function addMessage(role, text) {
   const element = document.createElement('div');
   element.className = `message message-${role}`;
-  if (role === 'bot') {
-    renderBotText(element, text);
-  } else {
-    element.textContent = text;
-  }
+  renderBotText(element, text);
   $('messages').append(element);
   scrollToBottom();
   return element;
 }
 
-function addNotice(text) {
-  const element = document.createElement('div');
-  element.className = 'message-error';
-  element.setAttribute('role', 'alert');
-  element.textContent = text;
-  $('messages').append(element);
+function addUserMessage(text) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'outgoing';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'message message-user';
+  bubble.textContent = text;
+
+  wrapper.append(bubble);
+  $('messages').append(wrapper);
   scrollToBottom();
-  return element;
+  return { text, wrapper, bubble, status: null };
 }
 
 function addTyping() {
@@ -269,8 +267,62 @@ function addTyping() {
   return element;
 }
 
+function buildStatusRow(item, reason, retryable) {
+  const row = document.createElement('div');
+  row.className = 'message-status';
+  row.setAttribute('role', 'alert');
+
+  const text = document.createElement('span');
+  text.textContent = `${t('chat.failed')}: ${reason}`;
+  row.append(text);
+
+  if (retryable) {
+    const retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'link-button status-retry';
+    retry.textContent = t('btn.retry');
+    retry.disabled = sending;
+    retry.addEventListener('click', () => retryItem(item));
+    row.append(retry);
+  }
+
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.className = 'link-button';
+  remove.textContent = t('btn.delete');
+  remove.addEventListener('click', () => item.wrapper.remove());
+  row.append(remove);
+
+  return row;
+}
+
+function setItemState(item, state, reason = '', retryable = true) {
+  item.bubble.classList.toggle('is-pending', state === 'pending');
+  item.bubble.classList.toggle('is-failed', state === 'failed');
+
+  if (item.status) {
+    item.status.remove();
+    item.status = null;
+  }
+  if (state !== 'failed') return;
+
+  item.status = buildStatusRow(item, reason, retryable);
+  item.wrapper.append(item.status);
+  scrollToBottom();
+}
+
+function setSending(value) {
+  sending = value;
+  $('send').disabled = value;
+  document.querySelectorAll('.status-retry').forEach((button) => {
+    button.disabled = value;
+  });
+}
+
 function resetChat() {
+  chatEpoch += 1;
   conversationId = null;
+  setSending(false);
   $('messages').replaceChildren();
   addMessage('bot', t('welcome'));
 }
@@ -278,13 +330,8 @@ function resetChat() {
 function autoResizeInput() {
   const input = $('input');
   input.style.height = 'auto';
-  input.style.height = Math.min(input.scrollHeight, 160) + 'px';
-}
-
-function setSending(value) {
-  sending = value;
-  $('send').disabled = value;
-  $('input').disabled = value;
+  const border = input.offsetHeight - input.clientHeight;
+  input.style.height = Math.min(input.scrollHeight + border, 160) + 'px';
 }
 
 function enterChat() {
@@ -304,64 +351,81 @@ function logout(errorKey) {
   }
 }
 
-async function sendMessage() {
-  const input = $('input');
-  const text = input.value.trim();
-  if (!text || sending) return;
 
+async function deliver(item) {
   const token = localStorage.getItem(TOKEN_KEY);
   if (!token) {
     logout('err.session_expired');
     return;
   }
 
+  const epoch = chatEpoch;
+  const hadConversation = conversationId !== null;
+
   setSending(true);
-  const userBubble = addMessage('user', text);
-  input.value = '';
-  autoResizeInput();
+  setItemState(item, 'pending');
   const typing = addTyping();
 
   try {
-    const body = { message: text };
-    if (conversationId !== null) body.conversation_id = conversationId;
+    const body = { message: item.text };
+    if (hadConversation) body.conversation_id = conversationId;
 
     const result = await api('/api/chat/', {
       method: 'POST',
       headers: { Authorization: 'Token ' + token },
       body: JSON.stringify(body),
     });
+
+    if (epoch !== chatEpoch) return;
     typing.remove();
 
     if (result.ok) {
       conversationId = result.data.conversation_id;
+      setItemState(item, 'sent');
       const bubble = addMessage('bot', result.data.response);
       if (result.data.crisis) bubble.classList.add('message-crisis');
       return;
     }
 
-    userBubble.remove();
-    input.value = text;
-    autoResizeInput();
-
     if (result.status === 401) {
       logout('err.session_expired');
-    } else if (result.status === 404 && conversationId !== null) {
-      conversationId = null;
-      addNotice(t('err.conversation_not_found'));
-    } else {
-      addNotice(describeChatError(result));
+      return;
     }
+
+    let reason;
+    if (result.status === 404 && hadConversation) {
+      conversationId = null;
+      reason = t('err.conversation_not_found');
+    } else {
+      reason = describeChatError(result);
+    }
+    setItemState(item, 'failed', reason, result.status !== 400);
   } catch (error) {
+    if (epoch !== chatEpoch) return;
     typing.remove();
-    userBubble.remove();
-    input.value = text;
-    autoResizeInput();
-    addNotice(t('err.network'));
+    setItemState(item, 'failed', t('err.network'), true);
     console.error(error);
   } finally {
-    setSending(false);
-    input.focus();
+    if (epoch === chatEpoch) setSending(false);
   }
+}
+
+function sendFromInput() {
+  const input = $('input');
+  const text = input.value.trim();
+  if (!text || sending) return;
+
+  const item = addUserMessage(text);
+  input.value = '';
+  autoResizeInput();
+  input.focus();
+  deliver(item);
+}
+
+function retryItem(item) {
+  if (sending) return;
+  $('messages').append(item.wrapper);
+  deliver(item);
 }
 
 
@@ -423,17 +487,16 @@ $('register-form').addEventListener('submit', (event) => {
 $('logout').addEventListener('click', () => logout());
 
 $('new-chat').addEventListener('click', () => {
-  if (sending) return;
   resetChat();
   $('input').focus();
 });
 
-$('send').addEventListener('click', sendMessage);
+$('send').addEventListener('click', sendFromInput);
 
 $('input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
     event.preventDefault();
-    sendMessage();
+    sendFromInput();
   }
 });
 

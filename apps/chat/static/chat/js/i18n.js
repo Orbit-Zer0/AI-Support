@@ -47,6 +47,9 @@ const STRINGS = {
     'err.message_too_long': 'Сообщение слишком длинное (максимум 4000 символов).',
     'err.message_required': 'Сначала напиши сообщение.',
     'err.invalid_conversation_id': 'Не удалось определить диалог. Начни новый чат.',
+    'chat.failed': 'Не отправлено',
+    'btn.retry': 'Повторить',
+    'btn.delete': 'Удалить',
   },
 
   en: {
@@ -97,6 +100,9 @@ const STRINGS = {
     'err.message_too_long': 'The message is too long (maximum 4000 characters).',
     'err.message_required': 'Please write a message first.',
     'err.invalid_conversation_id': "Couldn't identify the conversation. Start a new chat.",
+    'chat.failed': 'Not sent',
+    'btn.retry': 'Retry',
+    'btn.delete': 'Delete',
   },
 
   ky: {
@@ -147,6 +153,9 @@ const STRINGS = {
     'err.message_too_long': 'Билдирүү өтө узун (эң көбү 4000 символ).',
     'err.message_required': 'Адегенде билдирүү жаз.',
     'err.invalid_conversation_id': 'Диалогду аныктоо мүмкүн болгон жок. Жаңы чат баштоо керек.',
+    'chat.failed': 'Жөнөтүлгөн жок',
+    'btn.retry': 'Кайталоо',
+    'btn.delete': 'Өчүрүү',
   },
 };
 
