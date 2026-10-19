@@ -5,10 +5,12 @@ from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .models import Country, Language
 from .serializers import RegisterSerializer
 
 
 class RegisterView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -28,6 +30,7 @@ class RegisterView(APIView):
 
 
 class LoginView(ObtainAuthToken):
+    authentication_classes = []
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
     def post(self, request, *args, **kwargs):
@@ -44,3 +47,21 @@ class LoginView(ObtainAuthToken):
                 'language': profile.language_id if profile else None,
             }
         )
+
+
+class CountryListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        countries = Country.objects.filter(is_active=True).values('code', 'name')
+        return Response(list(countries))
+
+
+class LanguageListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        languages = Language.objects.filter(is_active=True).order_by('code').values('code', 'name')
+        return Response(list(languages))
