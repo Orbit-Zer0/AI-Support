@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ErrorDetail
 
 from .models import Country, Language, UserProfile
 
@@ -20,23 +22,37 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
-            raise serializers.ValidationError('This username is already taken.')
+            raise serializers.ValidationError(
+                'This username is already taken.', code='username_taken'
+            )
         return value
 
     def validate_country(self, value):
         try:
             return Country.objects.get(code=value.upper(), is_active=True)
         except Country.DoesNotExist:
-            raise serializers.ValidationError('Unknown or unsupported country code.')
+            raise serializers.ValidationError(
+                'Unknown or unsupported country code.', code='unknown_country'
+            )
 
     def validate_language(self, value):
         try:
             return Language.objects.get(code=value.lower(), is_active=True)
         except Language.DoesNotExist:
-            raise serializers.ValidationError('Unknown or unsupported language code.')
+            raise serializers.ValidationError(
+                'Unknown or unsupported language code.', code='unknown_language'
+            )
 
     def validate(self, attrs):
-        validate_password(attrs['password'], user=User(username=attrs['username']))
+        try:
+            validate_password(attrs['password'], user=User(username=attrs['username']))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({
+                'password': [
+                    ErrorDetail(message, code=error.code)
+                    for message, error in zip(exc.messages, exc.error_list)
+                ]
+            })
         return attrs
 
     def create(self, validated_data):

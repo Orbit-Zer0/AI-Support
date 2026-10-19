@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,20 +8,80 @@
   <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
 </head>
 <body>
-  <div class="app">
+
+  <section class="auth" id="auth-view" hidden>
+    <div class="auth-top">
+      <h1>AI Support</h1>
+      <select id="ui-language" class="lang-switch" data-i18n-aria-label="label.language"></select>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="login" data-i18n="tab.login"></button>
+      <button type="button" class="tab" data-tab="register" data-i18n="tab.register"></button>
+    </div>
+
+    <form class="form" id="login-form">
+      <div class="field">
+        <label for="login-username" data-i18n="label.username"></label>
+        <input id="login-username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password" data-i18n="label.password"></label>
+        <div class="password-field">
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+      </div>
+      <p class="form-error" id="login-error" role="alert"></p>
+      <button type="submit" data-i18n="btn.login"></button>
+    </form>
+
+    <form class="form" id="register-form" hidden>
+      <div class="field">
+        <label for="reg-username" data-i18n="label.username"></label>
+        <input id="reg-username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="reg-password" data-i18n="label.passwordNew"></label>
+        <div class="password-field">
+          <input id="reg-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-password-confirm" data-i18n="label.passwordConfirm"></label>
+        <div class="password-field">
+          <input id="reg-password-confirm" name="password_confirm" type="password" autocomplete="new-password" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-country" data-i18n="label.country"></label>
+        <select id="reg-country" name="country" required></select>
+      </div>
+      <p class="hint" data-i18n="hint.language"></p>
+      <p class="form-error" id="register-error" role="alert"></p>
+      <button type="submit" data-i18n="btn.register"></button>
+    </form>
+  </section>
+
+  <div class="app" id="chat-view" hidden>
     <header class="app-header">
       <h1>AI Support</h1>
+      <div class="header-right">
+        <span id="whoami"></span>
+        <button type="button" id="logout" class="link-button" data-i18n="btn.logout"></button>
+      </div>
     </header>
 
     <main class="messages" id="messages">
-      <div class="message message-bot">Привет! Я ИИ-помощник для эмоциональной поддержки.</div>
-      <div class="message message-user">Привет!</div>
+      <div class="message message-bot" data-i18n="welcome"></div>
     </main>
 
     <footer class="composer">
-      <textarea id="input" rows="1" placeholder="Напиши сообщение..."></textarea>
-      <button type="button" id="send">Отправить</button>
+      <textarea id="input" rows="1" data-i18n-placeholder="placeholder.message"></textarea>
+      <button type="button" id="send" data-i18n="btn.send"></button>
     </footer>
   </div>
+
+  <script src="{% static 'chat/js/i18n.js' %}"></script>
+  <script src="{% static 'chat/js/app.js' %}"></script>
 </body>
 </html>

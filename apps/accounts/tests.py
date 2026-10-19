@@ -10,8 +10,8 @@ class PublicListsTests(APITestCase):
         response = self.client.get(reverse('countries'))
         self.assertEqual(response.status_code, 200)
         codes = [c['code'] for c in response.data]
-        self.assertIn('KG', codes)        # засеяна миграцией
-        self.assertNotIn('ZZ', codes)     # отключена
+        self.assertIn('KG', codes)
+        self.assertNotIn('ZZ', codes)
 
     def test_languages_list(self):
         response = self.client.get(reverse('languages'))
