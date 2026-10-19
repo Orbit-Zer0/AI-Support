@@ -201,3 +201,31 @@ body {
 .toggle-password.is-visible .icon-eye-off { display: inline; }
 
 .hint { margin: 0; font-size: 0.8rem; color: #6b7280; }
+
+.message-bot { white-space: normal; }
+.message-bot > :first-child { margin-top: 0; }
+.message-bot > :last-child { margin-bottom: 0; }
+.message-bot p, .message-bot ul, .message-bot ol { margin: 0.5em 0; }
+.message-bot ul, .message-bot ol { padding-left: 1.4em; }
+.message-bot code { padding: 1px 4px; background: rgba(0, 0, 0, 0.08); border-radius: 4px; }
+.message-bot pre { overflow-x: auto; padding: 8px; background: rgba(0, 0, 0, 0.08); border-radius: 8px; }
+.message-bot hr { border: none; border-top: 1px solid var(--border); margin: 0.8em 0; }
+.message-bot a { color: var(--user-bubble); }
+
+.message-typing { opacity: 0.7; font-style: italic; }
+
+.message-crisis { border-left: 4px solid #f59e0b; }
+
+.message-error {
+  align-self: center;
+  max-width: 90%;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--error);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+}
+
+.composer textarea { max-height: 160px; }
+.composer button:disabled { opacity: 0.6; cursor: wait; }

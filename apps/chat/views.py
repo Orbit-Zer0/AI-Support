@@ -12,6 +12,12 @@ from .services import get_ai_response
 
 logger = logging.getLogger(__name__)
 
+MAX_MESSAGE_LENGTH = 4000
+
+
+def _error(code, message, status):
+    return Response({'error': message, 'code': code}, status=status)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -20,13 +26,19 @@ def chat_view(request):
     conversation_id = request.data.get('conversation_id')
 
     if not isinstance(user_message, str) or not user_message.strip():
-        return Response({'error': 'Field "message" is required.'}, status=400)
+        return _error('message_required', 'Field "message" is required.', 400)
+    if len(user_message) > MAX_MESSAGE_LENGTH:
+        return _error(
+            'message_too_long',
+            f'Message is too long (max {MAX_MESSAGE_LENGTH} characters).',
+            400,
+        )
 
     if conversation_id is not None:
         try:
             conversation_id = int(conversation_id)
         except (TypeError, ValueError):
-            return Response({'error': 'conversation_id must be a number.'}, status=400)
+            return _error('invalid_conversation_id', 'conversation_id must be a number.', 400)
         conversation = get_object_or_404(
             Conversation, id=conversation_id, user=request.user
         )
@@ -42,19 +54,19 @@ def chat_view(request):
         logger.exception('AI call failed')
         emergency = build_emergency_reply(user_message, request.user)
         if emergency is None:
-            status = 429 if getattr(exc, 'code', None) == 429 else 503
-            return Response(
-                {'error': 'The AI service is temporarily unavailable, please try again later.'},
-                status=status,
+            if getattr(exc, 'code', None) == 429:
+                return _error('ai_quota', 'Too many requests, try again later.', 429)
+            return _error(
+                'ai_unavailable',
+                'The AI service is temporarily unavailable, please try again later.',
+                503,
             )
         ai_response, crisis = emergency, True
     else:
         ai_response, crisis = apply_crisis_layer(user_message, ai_response, request.user)
 
     if not ai_response or not ai_response.strip():
-        return Response(
-            {'error': 'The AI service returned an empty response.'}, status=502
-        )
+        return _error('ai_empty', 'The AI service returned an empty response.', 502)
 
     if conversation is None:
         conversation = Conversation.objects.create(user=request.user)

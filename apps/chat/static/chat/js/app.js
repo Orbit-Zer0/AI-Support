@@ -7,6 +7,9 @@ let countryItems = [];
 let languageItems = [];
 let optionsLoaded = false;
 
+let conversationId = null;
+let sending = false;
+
 
 async function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
@@ -47,17 +50,31 @@ function formatErrors(data) {
   return messages.length ? [...new Set(messages)].join(' ') : t('err.generic');
 }
 
+function describeChatError(result) {
+  const code = result.data && result.data.code;
+  if (code) {
+    const key = 'err.' + code;
+    const text = t(key);
+    if (text !== key) return text;
+  }
+  return t('err.generic');
+}
+
+
+
 function makeCountryLabeler() {
   let names = null;
   try {
     names = new Intl.DisplayNames([currentLang], { type: 'region' });
   } catch (error) {
+    
   }
   return (item) => {
     try {
       const label = names && names.of(item.code);
       if (label && label !== item.code) return label;
     } catch (error) {
+      
     }
     return item.name;
   };
@@ -185,9 +202,166 @@ function clearSession() {
   localStorage.removeItem(USERNAME_KEY);
 }
 
+
+const PURIFY_CONFIG = {
+  ALLOWED_TAGS: [
+    'p', 'br', 'hr', 'strong', 'em', 'b', 'i', 'del', 'code', 'pre',
+    'ul', 'ol', 'li', 'blockquote', 'a',
+    'h1', 'h2', 'h3', 'h4',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+  ],
+  ALLOWED_ATTR: ['href'],
+};
+
+if (window.DOMPurify) {
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A') {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+}
+
+function renderBotText(element, text) {
+  if (window.marked && window.DOMPurify) {
+    const html = String(marked.parse(text, { breaks: true }));
+    element.innerHTML = DOMPurify.sanitize(html, PURIFY_CONFIG);
+  } else {
+    element.style.whiteSpace = 'pre-wrap';
+    element.textContent = text;
+  }
+}
+
+function scrollToBottom() {
+  const box = $('messages');
+  box.scrollTop = box.scrollHeight;
+}
+
+function addMessage(role, text) {
+  const element = document.createElement('div');
+  element.className = `message message-${role}`;
+  if (role === 'bot') {
+    renderBotText(element, text);
+  } else {
+    element.textContent = text;
+  }
+  $('messages').append(element);
+  scrollToBottom();
+  return element;
+}
+
+function addNotice(text) {
+  const element = document.createElement('div');
+  element.className = 'message-error';
+  element.setAttribute('role', 'alert');
+  element.textContent = text;
+  $('messages').append(element);
+  scrollToBottom();
+  return element;
+}
+
+function addTyping() {
+  const element = document.createElement('div');
+  element.className = 'message message-bot message-typing';
+  element.textContent = t('chat.typing');
+  $('messages').append(element);
+  scrollToBottom();
+  return element;
+}
+
+function resetChat() {
+  conversationId = null;
+  $('messages').replaceChildren();
+  addMessage('bot', t('welcome'));
+}
+
+function autoResizeInput() {
+  const input = $('input');
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+}
+
+function setSending(value) {
+  sending = value;
+  $('send').disabled = value;
+  $('input').disabled = value;
+}
+
 function enterChat() {
   $('whoami').textContent = localStorage.getItem(USERNAME_KEY) || '';
+  resetChat();
   showView('chat');
+}
+
+function logout(errorKey) {
+  clearSession();
+  resetChat();
+  hideAllPasswords();
+  showView('auth');
+  switchTab('login');
+  if (errorKey) {
+    $('login-error').textContent = t(errorKey);
+  }
+}
+
+async function sendMessage() {
+  const input = $('input');
+  const text = input.value.trim();
+  if (!text || sending) return;
+
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) {
+    logout('err.session_expired');
+    return;
+  }
+
+  setSending(true);
+  const userBubble = addMessage('user', text);
+  input.value = '';
+  autoResizeInput();
+  const typing = addTyping();
+
+  try {
+    const body = { message: text };
+    if (conversationId !== null) body.conversation_id = conversationId;
+
+    const result = await api('/api/chat/', {
+      method: 'POST',
+      headers: { Authorization: 'Token ' + token },
+      body: JSON.stringify(body),
+    });
+    typing.remove();
+
+    if (result.ok) {
+      conversationId = result.data.conversation_id;
+      const bubble = addMessage('bot', result.data.response);
+      if (result.data.crisis) bubble.classList.add('message-crisis');
+      return;
+    }
+
+    userBubble.remove();
+    input.value = text;
+    autoResizeInput();
+
+    if (result.status === 401) {
+      logout('err.session_expired');
+    } else if (result.status === 404 && conversationId !== null) {
+      conversationId = null;
+      addNotice(t('err.conversation_not_found'));
+    } else {
+      addNotice(describeChatError(result));
+    }
+  } catch (error) {
+    typing.remove();
+    userBubble.remove();
+    input.value = text;
+    autoResizeInput();
+    addNotice(t('err.network'));
+    console.error(error);
+  } finally {
+    setSending(false);
+    input.focus();
+  }
 }
 
 
@@ -246,11 +420,24 @@ $('register-form').addEventListener('submit', (event) => {
   submitAuth(event.target, '/api/register/', $('register-error'));
 });
 
-$('logout').addEventListener('click', () => {
-  clearSession();
-  showView('auth');
-  switchTab('login');
+$('logout').addEventListener('click', () => logout());
+
+$('new-chat').addEventListener('click', () => {
+  if (sending) return;
+  resetChat();
+  $('input').focus();
 });
+
+$('send').addEventListener('click', sendMessage);
+
+$('input').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+$('input').addEventListener('input', autoResizeInput);
 
 currentLang = detectLanguage();
 initPasswordToggles();

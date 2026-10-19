@@ -67,19 +67,21 @@
       <h1>AI Support</h1>
       <div class="header-right">
         <span id="whoami"></span>
+        <button type="button" id="new-chat" class="link-button" data-i18n="btn.newChat"></button>
         <button type="button" id="logout" class="link-button" data-i18n="btn.logout"></button>
       </div>
     </header>
 
-    <main class="messages" id="messages">
-      <div class="message message-bot" data-i18n="welcome"></div>
-    </main>
+    <main class="messages" id="messages" aria-live="polite"></main>
 
     <footer class="composer">
-      <textarea id="input" rows="1" data-i18n-placeholder="placeholder.message"></textarea>
+      <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
       <button type="button" id="send" data-i18n="btn.send"></button>
     </footer>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@17.0.6/lib/marked.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.14/dist/purify.min.js"></script>
 
   <script src="{% static 'chat/js/i18n.js' %}"></script>
   <script src="{% static 'chat/js/app.js' %}"></script>
