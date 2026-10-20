@@ -67,6 +67,7 @@
       <h1>AI Support</h1>
       <div class="header-right">
         <span id="whoami"></span>
+        <button type="button" id="history-btn" class="link-button" data-i18n="btn.history"></button>
         <button type="button" id="new-chat" class="link-button" data-i18n="btn.newChat"></button>
         <button type="button" id="logout" class="link-button" data-i18n="btn.logout"></button>
       </div>
@@ -78,6 +79,15 @@
       <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
       <button type="button" id="send" data-i18n="btn.send"></button>
     </footer>
+    <aside class="history" id="history-panel" hidden>
+      <div class="history-header">
+        <h2 data-i18n="history.title"></h2>
+        <button type="button" id="history-close" class="link-button" data-i18n="btn.close"></button>
+      </div>
+      <p class="form-error history-error" id="history-error" role="alert"></p>
+      <p class="history-empty" id="history-empty" hidden data-i18n="history.empty"></p>
+      <ul class="history-list" id="history-list"></ul>
+    </aside>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked@17.0.6/lib/marked.umd.js"></script>

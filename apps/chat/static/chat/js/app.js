@@ -346,12 +346,14 @@ function autoResizeInput() {
 
 function enterChat() {
   $('whoami').textContent = localStorage.getItem(USERNAME_KEY) || '';
+  closeHistory();
   resetChat();
   showView('chat');
 }
 
 function logout(errorKey) {
   clearSession();
+  closeHistory();
   resetChat();
   hideAllPasswords();
   showView('auth');
@@ -438,6 +440,150 @@ function retryItem(item) {
   deliver(item);
 }
 
+function authHeaders() {
+  return { Authorization: 'Token ' + localStorage.getItem(TOKEN_KEY) };
+}
+
+function formatDate(iso) {
+  const date = new Date(iso);
+  try {
+    return new Intl.DateTimeFormat(currentLang, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  } catch (error) {
+    return date.toLocaleString();
+  }
+}
+
+function closeHistory() {
+  $('history-panel').hidden = true;
+}
+
+function updateHistoryEmptyState() {
+  $('history-empty').hidden = $('history-list').children.length > 0;
+}
+
+function renderHistory(items) {
+  const list = $('history-list');
+  list.replaceChildren();
+
+  for (const item of items) {
+    const row = document.createElement('li');
+    row.className = 'history-row';
+
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.className = 'history-item';
+
+    const title = document.createElement('span');
+    title.className = 'history-title';
+    title.textContent = item.title || t('history.untitled');
+
+    const date = document.createElement('span');
+    date.className = 'history-date';
+    date.textContent = formatDate(item.updated_at);
+
+    open.append(title, date);
+    open.addEventListener('click', () => openConversation(item.id));
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'link-button history-delete';
+    remove.textContent = t('btn.delete');
+    remove.addEventListener('click', () => deleteConversation(item.id, row));
+
+    row.append(open, remove);
+    list.append(row);
+  }
+  updateHistoryEmptyState();
+}
+
+async function openHistory() {
+  if (sending) return;
+  $('history-error').textContent = '';
+  $('history-list').replaceChildren();
+  $('history-empty').hidden = true;
+  $('history-panel').hidden = false;
+
+  try {
+    const result = await api('/api/conversations/', { headers: authHeaders() });
+    if (result.status === 401) {
+      logout('err.session_expired');
+      return;
+    }
+    if (!result.ok) {
+      $('history-error').textContent = t('err.history_load');
+      return;
+    }
+    renderHistory(result.data);
+  } catch (error) {
+    $('history-error').textContent = t('err.network');
+    console.error(error);
+  }
+}
+
+async function openConversation(id) {
+  if (sending) return;
+  setSending(true);
+  try {
+    const result = await api(`/api/conversations/${id}/`, { headers: authHeaders() });
+    if (result.status === 401) {
+      logout('err.session_expired');
+      return;
+    }
+    if (!result.ok) {
+      $('history-error').textContent = t('err.conversation_load');
+      return;
+    }
+
+    chatEpoch += 1;
+    conversationId = result.data.id;
+    $('messages').replaceChildren();
+    for (const message of result.data.messages) {
+      if (message.role === 'user') {
+        addUserMessage(message.content);
+      } else {
+        const bubble = addMessage('bot', message.content);
+        if (message.crisis) bubble.classList.add('message-crisis');
+      }
+    }
+    closeHistory();
+    scrollToBottom();
+    $('input').focus();
+  } catch (error) {
+    $('history-error').textContent = t('err.network');
+    console.error(error);
+  } finally {
+    setSending(false);
+  }
+}
+
+async function deleteConversation(id, row) {
+  if (sending) return;
+  if (!window.confirm(t('confirm.deleteChat'))) return;
+
+  try {
+    const result = await api(`/api/conversations/${id}/`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    if (result.status === 401) {
+      logout('err.session_expired');
+      return;
+    }
+    if (result.ok || result.status === 404) {
+      row.remove();
+      updateHistoryEmptyState();
+      if (id === conversationId) resetChat();
+      return;
+    }
+    $('history-error').textContent = t('err.delete_failed');
+  } catch (error) {
+    $('history-error').textContent = t('err.network');
+    console.error(error);
+  }
+}
 
 async function submitAuth(form, path, errorElement) {
   errorElement.textContent = '';
@@ -513,6 +659,12 @@ $('input').addEventListener('keydown', (event) => {
 });
 
 $('input').addEventListener('input', autoResizeInput);
+$('history-btn').addEventListener('click', openHistory);
+$('history-close').addEventListener('click', closeHistory);
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !$('history-panel').hidden) closeHistory();
+});
 
 currentLang = detectLanguage();
 initPasswordToggles();

@@ -52,6 +52,15 @@ const STRINGS = {
         'chat.failed': 'Не отправлено',
         'btn.retry': 'Повторить',
         'btn.delete': 'Удалить',
+        'btn.history': 'История',
+        'btn.close': 'Закрыть',
+        'history.title': 'История диалогов',
+        'history.empty': 'Пока нет сохранённых диалогов.',
+        'history.untitled': 'Без названия',
+        'confirm.deleteChat': 'Удалить этот диалог навсегда?',
+        'err.history_load': 'Не удалось загрузить историю.',
+        'err.conversation_load': 'Не удалось открыть диалог.',
+        'err.delete_failed': 'Не удалось удалить диалог.',
     },
 
     en: {
@@ -107,6 +116,15 @@ const STRINGS = {
         'chat.failed': 'Not sent',
         'btn.retry': 'Retry',
         'btn.delete': 'Delete',
+        'btn.history': 'History',
+        'btn.close': 'Close',
+        'history.title': 'Conversation history',
+        'history.empty': 'No saved conversations yet.',
+        'history.untitled': 'Untitled',
+        'confirm.deleteChat': 'Delete this conversation permanently?',
+        'err.history_load': "Couldn't load your history.",
+        'err.conversation_load': "Couldn't open this conversation.",
+        'err.delete_failed': "Couldn't delete the conversation.",
     },
 
     ky: {
@@ -162,6 +180,15 @@ const STRINGS = {
         'chat.failed': 'Жөнөтүлгөн жок',
         'btn.retry': 'Кайталоо',
         'btn.delete': 'Өчүрүү',
+        'btn.history': 'Тарых',
+        'btn.close': 'Жабуу',
+        'history.title': 'Диалогдор тарыхы',
+        'history.empty': 'Сакталган диалогдор азырынча жок.',
+        'history.untitled': 'Аталышы жок',
+        'confirm.deleteChat': 'Бул диалогду биротоло өчүрөсүңбү?',
+        'err.history_load': 'Тарыхты жүктөө мүмкүн болгон жок.',
+        'err.conversation_load': 'Диалогду ачуу мүмкүн болгон жок.',
+        'err.delete_failed': 'Диалогду өчүрүү мүмкүн болгон жок.',
     },
 };
 
