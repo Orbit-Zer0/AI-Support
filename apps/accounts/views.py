@@ -4,13 +4,14 @@ from rest_framework.permissions import AllowAny
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from .throttles import AuthThrottle
 from .models import Country, Language
 from .serializers import RegisterSerializer
 
 
 class RegisterView(APIView):
     authentication_classes = []
+    throttle_classes = [AuthThrottle]
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -31,6 +32,7 @@ class RegisterView(APIView):
 
 class LoginView(ObtainAuthToken):
     authentication_classes = []
+    throttle_classes = [AuthThrottle]
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
     def post(self, request, *args, **kwargs):

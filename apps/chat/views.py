@@ -1,14 +1,16 @@
 import logging
 
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.crisis.layer import apply_crisis_layer, build_emergency_reply
 
+from .memory import get_history, maybe_summarize
 from .models import Conversation, Message
 from .services import get_ai_response
+from .throttles import ChatBurstThrottle, ChatDailyThrottle
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,7 @@ def _error(code, message, status):
 
 
 @api_view(['POST'])
+@throttle_classes([ChatBurstThrottle, ChatDailyThrottle])
 @permission_classes([IsAuthenticated])
 def chat_view(request):
     user_message = request.data.get('message')
@@ -42,7 +45,7 @@ def chat_view(request):
         conversation = get_object_or_404(
             Conversation, id=conversation_id, user=request.user
         )
-        history = list(conversation.messages.values('role', 'content'))
+        history = get_history(conversation)
     else:
         conversation = None
         history = []
@@ -73,6 +76,8 @@ def chat_view(request):
 
     Message.objects.create(conversation=conversation, role='user', content=user_message)
     Message.objects.create(conversation=conversation, role='model', content=ai_response)
+
+    maybe_summarize(conversation)
 
     return Response(
         {

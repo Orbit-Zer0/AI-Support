@@ -51,8 +51,18 @@ function formatErrors(data) {
   return messages.length ? [...new Set(messages)].join(' ') : t('err.generic');
 }
 
+function throttledMessage(data) {
+  const seconds = data && data.retry_after;
+  if (!seconds) return t('err.ai_quota');
+  if (seconds > 90) {
+    return t('err.throttled_minutes').replace('{minutes}', Math.ceil(seconds / 60));
+  }
+  return t('err.throttled').replace('{seconds}', seconds);
+}
+
 function describeChatError(result) {
   const code = result.data && result.data.code;
+  if (code === 'throttled') return throttledMessage(result.data);
   if (code) {
     const key = 'err.' + code;
     const text = t(key);
@@ -455,7 +465,9 @@ async function submitAuth(form, path, errorElement) {
       hideAllPasswords();
       enterChat();
     } else {
-      errorElement.textContent = formatErrors(result.data);
+      errorElement.textContent = result.status === 429
+        ? throttledMessage(result.data)
+        : formatErrors(result.data);
     }
   } catch (error) {
     errorElement.textContent = t('err.network');
