@@ -15,6 +15,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-3.1-flash-lite').strip()
+GEMINI_FALLBACK_MODELS = [
+    name.strip()
+    for name in os.getenv('GEMINI_FALLBACK_MODELS', '').split(',')
+    if name.strip()
+]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
@@ -144,6 +150,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'chat_burst': '6/min',
         'chat_daily': '150/day',
+        'chat_title': '30/hour',
         'auth': '30/hour',
     },
 }

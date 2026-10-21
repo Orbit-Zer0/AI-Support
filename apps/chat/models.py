@@ -11,6 +11,7 @@ class Conversation(models.Model):
         blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=80, blank=True, default='')
     summary = models.TextField(blank=True, default='')
     summarized_until = models.PositiveBigIntegerField(default=0)
 

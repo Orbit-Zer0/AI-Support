@@ -62,38 +62,113 @@
     </form>
   </section>
 
-  <div class="app" id="chat-view" hidden>
-    <header class="app-header">
-      <h1>AI Support</h1>
-      <div class="header-right">
-        <span id="whoami"></span>
-        <button type="button" id="history-btn" class="link-button" data-i18n="btn.history"></button>
-        <button type="button" id="new-chat" class="link-button" data-i18n="btn.newChat"></button>
-        <button type="button" id="logout" class="link-button" data-i18n="btn.logout"></button>
-      </div>
-    </header>
+  <div class="shell" id="chat-view" hidden>
 
-    <main class="messages" id="messages" aria-live="polite"></main>
+    <div class="sidebar" id="sidebar">
 
-    <footer class="composer">
-      <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
-      <button type="button" id="send" data-i18n="btn.send"></button>
-    </footer>
-    <aside class="history" id="history-panel" hidden>
-      <div class="history-header">
-        <h2 data-i18n="history.title"></h2>
-        <button type="button" id="history-close" class="link-button" data-i18n="btn.close"></button>
+      <aside class="rail">
+        <div class="rail-top">
+          <h1 class="brand">
+            <span class="brand-full">AI Support</span>
+            <span class="brand-short" aria-hidden="true">AI</span>
+          </h1>
+          <div class="rail-icons">
+            <button type="button" class="icon-btn" id="btn-help" data-icon="lifebuoy"
+                    data-i18n-title="help.button" data-i18n-aria-label="help.button"></button>
+            <button type="button" class="icon-btn" data-icon="sliders"
+                    data-i18n-title="settings.ai" data-i18n-aria-label="settings.ai"></button>
+            <button type="button" class="icon-btn" data-icon="palette"
+                    data-i18n-title="settings.appearance" data-i18n-aria-label="settings.appearance"></button>
+            <button type="button" class="icon-btn" data-icon="user"
+                    data-i18n-title="settings.profile" data-i18n-aria-label="settings.profile"></button>
+            <button type="button" class="icon-btn" data-icon="command"
+                    data-i18n-title="settings.hotkeys" data-i18n-aria-label="settings.hotkeys"></button>
+          </div>
+        </div>
+
+        <div class="rail-bottom">
+          <div class="user-block">
+            <div class="avatar" id="avatar" aria-hidden="true"></div>
+            <span id="whoami"></span>
+          </div>
+          <button type="button" class="logout-btn" id="logout">
+            <span data-icon="logout"></span>
+            <span class="logout-label" data-i18n="btn.logout"></span>
+          </button>
+        </div>
+      </aside>
+
+      <aside class="chats" id="chats-panel">
+        <div class="chats-top">
+          <button type="button" class="new-chat-btn" id="new-chat">
+            <span data-icon="plus"></span>
+            <span data-i18n="btn.newChat"></span>
+          </button>
+          <button type="button" class="icon-btn" id="chats-collapse" data-icon="chevron-left"
+                  data-i18n-title="chats.collapse" data-i18n-aria-label="chats.collapse"></button>
+        </div>
+        <div class="chats-search">
+          <span class="search-icon" data-icon="search"></span>
+          <input type="search" id="chats-search" autocomplete="off" data-i18n-placeholder="chats.search">
+        </div>
+        <p class="form-error chats-error" id="chats-error" role="alert"></p>
+        <p class="chats-empty" id="chats-empty" hidden></p>
+        <ul class="chats-list" id="chats-list"></ul>
+      </aside>
+    </div>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <main class="main">
+      <div class="topbar">
+        <button type="button" class="icon-btn" id="sidebar-open" data-icon="menu"
+                data-i18n-aria-label="btn.menu"></button>
+        <button type="button" class="icon-btn" id="chats-expand" data-icon="chevron-right"
+                data-i18n-title="chats.expand" data-i18n-aria-label="chats.expand"></button>
+        <h2 class="chat-title" id="chat-title"></h2>
       </div>
-      <p class="form-error history-error" id="history-error" role="alert"></p>
-      <p class="history-empty" id="history-empty" hidden data-i18n="history.empty"></p>
-      <ul class="history-list" id="history-list"></ul>
-    </aside>
+
+      <div class="messages" id="messages" aria-live="polite"></div>
+
+      <div class="composer-bar">
+        <div class="composer">
+          <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
+          <button type="button" id="send" data-i18n="btn.send"></button>
+        </div>
+      </div>
+    </main>
   </div>
+
+  <dialog id="help-dialog" class="dialog" aria-labelledby="help-title">
+    <div class="dialog-body">
+      <h2 id="help-title" data-i18n="help.title"></h2>
+      <p data-i18n="help.intro"></p>
+      <ul class="help-list" id="help-list"></ul>
+      <p class="help-fallback" id="help-fallback"></p>
+      <div class="dialog-actions">
+        <button type="button" id="help-close" data-i18n="btn.close"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="notice-dialog" class="dialog" aria-labelledby="notice-title">
+    <div class="dialog-body">
+      <h2 id="notice-title" data-i18n="notice.title"></h2>
+      <p data-i18n="notice.text"></p>
+      <div class="dialog-actions">
+        <button type="button" id="notice-ok" data-i18n="notice.ok"></button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/marked@17.0.6/lib/marked.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.14/dist/purify.min.js"></script>
 
   <script src="{% static 'chat/js/i18n.js' %}"></script>
-  <script src="{% static 'chat/js/app.js' %}"></script>
+  <script src="{% static 'chat/js/core.js' %}"></script>
+  <script src="{% static 'chat/js/auth.js' %}"></script>
+  <script src="{% static 'chat/js/chat.js' %}"></script>
+  <script src="{% static 'chat/js/sidebar.js' %}"></script>
+  <script src="{% static 'chat/js/main.js' %}"></script>
 </body>
 </html>
