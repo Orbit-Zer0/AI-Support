@@ -276,3 +276,12 @@ function maybeShowNotice() {
     dialog.showModal();
   }
 }
+
+function setUserMenuOpen(open) {
+  $('user-zone').classList.toggle('open', open);
+  $('btn-profile').setAttribute('aria-expanded', String(open));
+}
+
+function closeUserMenu() {
+  setUserMenuOpen(false);
+}

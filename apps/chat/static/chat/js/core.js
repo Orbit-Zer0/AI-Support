@@ -97,3 +97,11 @@ function renderIcons(root = document) {
       paths + '</svg>';
   }
 }
+
+const CONTACT_EMAIL = 'support@example.com';
+
+function setupContact() {
+  const link = $('contact-link');
+  link.href = 'mailto:' + CONTACT_EMAIL;
+  link.textContent = CONTACT_EMAIL;
+}

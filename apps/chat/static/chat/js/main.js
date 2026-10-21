@@ -36,9 +36,21 @@ $('sidebar-open').addEventListener('click', openSidebarDrawer);
 $('scrim').addEventListener('click', closeSidebarDrawer);
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeSidebarDrawer();
+  if (event.key === 'Escape') {
+    closeSidebarDrawer();
+    closeUserMenu();
+  }
 });
 
+$('btn-profile').addEventListener('click', () => {
+  if (window.matchMedia('(hover: none)').matches) {
+    setUserMenuOpen(!$('user-zone').classList.contains('open'));
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('#user-zone')) closeUserMenu();
+});
 
 $('btn-help').addEventListener('click', openHelp);
 $('help-close').addEventListener('click', () => $('help-dialog').close());
@@ -66,6 +78,7 @@ $('input').addEventListener('input', autoResizeInput);
 
 currentLang = detectLanguage();
 renderIcons();
+setupContact();
 initPasswordToggles();
 applyTranslations();
 renderSelects();

@@ -66,54 +66,70 @@
 
     <div class="sidebar" id="sidebar">
 
-      <aside class="rail">
-        <div class="rail-top">
-          <h1 class="brand">
-            <span class="brand-full">AI Support</span>
-            <span class="brand-short" aria-hidden="true">AI</span>
-          </h1>
-          <div class="rail-icons">
-            <button type="button" class="icon-btn" id="btn-help" data-icon="lifebuoy"
-                    data-i18n-title="help.button" data-i18n-aria-label="help.button"></button>
-            <button type="button" class="icon-btn" data-icon="sliders"
-                    data-i18n-title="settings.ai" data-i18n-aria-label="settings.ai"></button>
-            <button type="button" class="icon-btn" data-icon="palette"
-                    data-i18n-title="settings.appearance" data-i18n-aria-label="settings.appearance"></button>
-            <button type="button" class="icon-btn" data-icon="user"
-                    data-i18n-title="settings.profile" data-i18n-aria-label="settings.profile"></button>
-            <button type="button" class="icon-btn" data-icon="command"
-                    data-i18n-title="settings.hotkeys" data-i18n-aria-label="settings.hotkeys"></button>
-          </div>
-        </div>
+      <aside class="rail" id="rail">
+        <div class="rail-inner">
+          <div class="rail-top">
+            <h1 class="brand">
+              <span class="brand-short" aria-hidden="true">AI</span>
+              <span class="brand-full">AI Support</span>
+            </h1>
 
-        <div class="rail-bottom">
-          <div class="user-block">
-            <div class="avatar" id="avatar" aria-hidden="true"></div>
-            <span id="whoami"></span>
+            <nav class="rail-nav">
+              <button type="button" class="rail-item rail-item-help" id="btn-help">
+                <span class="rail-icon" data-icon="lifebuoy"></span>
+                <span class="rail-label" data-i18n="help.button"></span>
+              </button>
+              <button type="button" class="rail-item" id="btn-settings-ai">
+                <span class="rail-icon" data-icon="sliders"></span>
+                <span class="rail-label" data-i18n="settings.ai"></span>
+              </button>
+              <button type="button" class="rail-item" id="btn-settings-appearance">
+                <span class="rail-icon" data-icon="palette"></span>
+                <span class="rail-label" data-i18n="settings.appearance"></span>
+              </button>
+              <button type="button" class="rail-item" id="btn-settings-hotkeys">
+                <span class="rail-icon" data-icon="command"></span>
+                <span class="rail-label" data-i18n="settings.hotkeys"></span>
+              </button>
+            </nav>
           </div>
-          <button type="button" class="logout-btn" id="logout">
-            <span data-icon="logout"></span>
-            <span class="logout-label" data-i18n="btn.logout"></span>
-          </button>
+
+          <div class="rail-bottom">
+            <div class="user-zone" id="user-zone">
+              <div class="logout-pop">
+                <button type="button" class="logout-btn" id="logout">
+                  <span data-icon="logout"></span>
+                  <span data-i18n="btn.logout"></span>
+                </button>
+              </div>
+              <button type="button" class="rail-item rail-user" id="btn-profile"
+                      aria-haspopup="true" aria-expanded="false">
+                <span class="avatar" id="avatar" aria-hidden="true"></span>
+                <span class="rail-label" id="whoami"></span>
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
 
       <aside class="chats" id="chats-panel">
-        <div class="chats-top">
-          <button type="button" class="new-chat-btn" id="new-chat">
-            <span data-icon="plus"></span>
-            <span data-i18n="btn.newChat"></span>
-          </button>
-          <button type="button" class="icon-btn" id="chats-collapse" data-icon="chevron-left"
-                  data-i18n-title="chats.collapse" data-i18n-aria-label="chats.collapse"></button>
+        <div class="chats-inner">
+          <div class="chats-top">
+            <button type="button" class="new-chat-btn" id="new-chat">
+              <span data-icon="plus"></span>
+              <span data-i18n="btn.newChat"></span>
+            </button>
+            <button type="button" class="icon-btn" id="chats-collapse" data-icon="chevron-left"
+                    data-i18n-title="chats.collapse" data-i18n-aria-label="chats.collapse"></button>
+          </div>
+          <div class="chats-search">
+            <span class="search-icon" data-icon="search"></span>
+            <input type="search" id="chats-search" autocomplete="off" data-i18n-placeholder="chats.search">
+          </div>
+          <p class="form-error chats-error" id="chats-error" role="alert"></p>
+          <p class="chats-empty" id="chats-empty" hidden></p>
+          <ul class="chats-list" id="chats-list"></ul>
         </div>
-        <div class="chats-search">
-          <span class="search-icon" data-icon="search"></span>
-          <input type="search" id="chats-search" autocomplete="off" data-i18n-placeholder="chats.search">
-        </div>
-        <p class="form-error chats-error" id="chats-error" role="alert"></p>
-        <p class="chats-empty" id="chats-empty" hidden></p>
-        <ul class="chats-list" id="chats-list"></ul>
       </aside>
     </div>
 
@@ -135,6 +151,11 @@
           <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
           <button type="button" id="send" data-i18n="btn.send"></button>
         </div>
+        <p class="disclaimer" data-i18n="disclaimer.text"></p>
+        <p class="contact">
+          <span data-i18n="contact.text"></span>
+          <a id="contact-link"></a>
+        </p>
       </div>
     </main>
   </div>

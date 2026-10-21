@@ -155,6 +155,7 @@ function logout(errorKey) {
   clearSession();
   document.querySelectorAll('dialog[open]').forEach((dialog) => dialog.close());
   closeSidebarDrawer();
+  closeUserMenu();
   resetChat();
   clearChatList();
   hideAllPasswords();

@@ -83,6 +83,8 @@ const STRINGS = {
         'notice.title': 'Важно знать',
         'notice.text': 'Я ИИ-помощник, а не врач или психолог, и не заменяю живую помощь. Если тебе очень тяжело или есть угроза жизни, нажми кнопку со спасательным кругом слева: там сразу номера служб твоей страны.',
         'notice.ok': 'Понятно',
+        'disclaimer.text': 'Я ИИ-помощник, а не врач или психолог, и могу ошибаться. Если тебе очень тяжело, нажми на спасательный круг слева.',
+        'contact.text': 'Нашёл ошибку или есть вопрос? Напиши нам: ',
     },
 
     en: {
@@ -169,6 +171,8 @@ const STRINGS = {
         'notice.title': 'Good to know',
         'notice.text': "I'm an AI assistant, not a doctor or a therapist, and I don't replace real human help. If things feel overwhelming or life is in danger, press the lifebuoy button on the left to see emergency numbers for your country right away.",
         'notice.ok': 'Got it',
+        'disclaimer.text': "I'm an AI assistant, not a doctor or therapist, and I can make mistakes. If things feel overwhelming, press the lifebuoy on the left.",
+        'contact.text': 'Found a bug or have a question? Write to us:',
     },
 
     ky: {
@@ -255,6 +259,8 @@ const STRINGS = {
         'notice.title': 'Билип кой',
         'notice.text': 'Мен жасалма интеллект жардамчысымын, дарыгер же психолог эмесмин жана чыныгы жардамдын ордун баспайм. Эгер өтө оор болсо же өмүргө коркунуч болсо, сол жактагы куткаруу тегереги баскычын бас: ал жерде өлкөңдөгү кызматтардын номерлери дароо көрүнөт.',
         'notice.ok': 'Түшүндүм',
+        'disclaimer.text': 'Мен жасалма интеллект жардамчысымын, дарыгер же психолог эмесмин жана жаңылышышым мүмкүн. Эгер өтө оор болсо, сол жактагы куткаруу тегерегин бас.',
+        'contact.text': 'Ката таптыңбы же суроо барбы? Бизге жаз:',
     },
 };
 
