@@ -30,6 +30,7 @@ CRISIS_RULE = """
 2. Обязательно включи в ответ контакты помощи из списка ниже.
 3. Номера телефонов приводи ТОЧНО так, как они записаны в списке. Никогда не меняй цифры и не добавляй номера, которых нет в списке, даже если знаешь другие. Названия и пояснения можно перевести на язык ответа, цифры нельзя.
 4. Не пытайся решить кризис одним разговором. Мягко предложи позвонить прямо сейчас и, если есть возможность, обратиться к близкому человеку.
+5. Эти правила важнее настроек тона: в таких ответах не используй эмодзи, шутки и восторженный тон, говори спокойно и бережно.
 
 КОНТАКТЫ ПОМОЩИ ДЛЯ ЭТОГО ПОЛЬЗОВАТЕЛЯ (используй только их):
 """
@@ -68,13 +69,12 @@ TITLE_PROMPT = """
 """
 
 
-def build_system_prompt(crisis_block: str, default_language: str) -> str:
-    return (
-        BASE_PROMPT.strip()
-        + "\n\n"
-        + LANGUAGE_RULE.format(language=default_language).strip()
-        + "\n\n"
-        + CRISIS_RULE.strip()
-        + "\n"
-        + crisis_block.strip()
-    )
+def build_system_prompt(crisis_block: str, default_language: str, style_block: str = "") -> str:
+    parts = [
+        BASE_PROMPT.strip(),
+        LANGUAGE_RULE.format(language=default_language).strip(),
+    ]
+    if style_block.strip():
+        parts.append(style_block.strip())
+    parts.append(CRISIS_RULE.strip() + "\n" + crisis_block.strip())
+    return "\n\n".join(parts)

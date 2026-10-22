@@ -1,3 +1,6 @@
+from apps.accounts.user_settings import get_user_settings
+from .styles import build_style_block
+
 import logging
 import re
 from functools import lru_cache
@@ -51,11 +54,18 @@ def _default_language_name(user):
     language = getattr(profile, 'language', None)
     return language.name if language else 'English'
 
+def _style_block_for(user):
+    try:
+        return build_style_block(get_user_settings(user)['ai_style'])
+    except Exception:
+        logger.exception('Failed to load AI style settings')
+        return build_style_block(None)
 
 def get_ai_response(message_history: list[dict], new_message: str, user) -> str:
     system_prompt = build_system_prompt(
         crisis_block=build_crisis_block_for_user(user),
         default_language=_default_language_name(user),
+        style_block=_style_block_for(user),
     )
 
     gemini_history = [

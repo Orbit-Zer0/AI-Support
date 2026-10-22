@@ -13,6 +13,13 @@ const THEMES = ['light', 'dark', 'auto'];
 const FONT_SIZES = ['small', 'medium', 'large', 'xlarge'];
 const FONT_FAMILIES = ['system', 'serif', 'mono', 'readable'];
 
+const THEME_DEFAULT_COLORS = {
+  light: { user: '#3b82f6', bot: '#e5e7eb' },
+  dark: { user: '#3b82f6', bot: '#2a2f38' },
+};
+
+const MIN_COLOR_DISTANCE = 25;
+
 let currentAppearance = { ...APPEARANCE_DEFAULTS };
 const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -82,10 +89,47 @@ function isYellowish(hex) {
   return hue >= 25 && hue <= 75 && saturation >= 0.35 && lightness >= 0.25 && lightness <= 0.85;
 }
 
+function hexToLab(hex) {
+  const [r, g, b] = hexToRgb(hex).map((value) => {
+    const c = value / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  const x = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047;
+  const y = 0.2126729 * r + 0.7151522 * g + 0.072175 * b;
+  const z = (0.0193339 * r + 0.119192 * g + 0.9503041 * b) / 1.08883;
+  const f = (v) => (v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116);
+  return [116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))];
+}
+
+function colorDistance(hexA, hexB) {
+  const a = hexToLab(hexA);
+  const b = hexToLab(hexB);
+  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
 
 function effectiveTheme(theme) {
   if (theme === 'auto') return darkQuery.matches ? 'dark' : 'light';
   return theme;
+}
+
+function resolveBubbleColors(appearance, theme) {
+  const defaults = THEME_DEFAULT_COLORS[theme] || THEME_DEFAULT_COLORS.light;
+  let userCustom = appearance.user_bubble || null;
+  let botCustom = appearance.bot_bubble || null;
+
+  const distinct = () =>
+    colorDistance(userCustom || defaults.user, botCustom || defaults.bot) >= MIN_COLOR_DISTANCE;
+
+  if (!distinct()) botCustom = null;
+  if (!distinct()) userCustom = null;
+
+  return {
+    userCustom,
+    botCustom,
+    user: userCustom || defaults.user,
+    bot: botCustom || defaults.bot,
+  };
 }
 
 function setColorVariables(root, backgroundVar, textVar, hex) {
@@ -108,10 +152,11 @@ function applyAppearance(raw) {
   root.dataset.fontSize = appearance.font_size;
   root.dataset.font = appearance.font_family;
 
-  setColorVariables(root, '--user-bubble', '--user-text', appearance.user_bubble);
-  setColorVariables(root, '--bot-bubble', '--bot-text', appearance.bot_bubble);
+  const colors = resolveBubbleColors(appearance, theme);
+  setColorVariables(root, '--user-bubble', '--user-text', colors.userCustom);
+  setColorVariables(root, '--bot-bubble', '--bot-text', colors.botCustom);
 
-  const yellowish = [appearance.user_bubble, appearance.bot_bubble]
+  const yellowish = [colors.userCustom, colors.botCustom]
     .some((color) => color && isYellowish(color));
   if (yellowish) {
     root.style.setProperty('--crisis', theme === 'dark' ? '#f87171' : '#dc2626');

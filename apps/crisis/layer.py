@@ -22,12 +22,20 @@ def _contains_phone(text, phone):
     pattern = r'(?<!\d)' + r'[\s\-()]*'.join(re.escape(d) for d in digits) + r'(?!\d)'
     return re.search(pattern, text) is not None
 
+_EMOJI_RE = re.compile(
+    '[\U0001F000-\U0001FAFF\U00002600-\U000027BF\uFE0F]'
+)
+
+def strip_emoji(text):
+    cleaned = _EMOJI_RE.sub('', text)
+    return re.sub(r'[ \t]{2,}', ' ', cleaned)
 
 def apply_crisis_layer(user_message, ai_response, user):
     if not detect_crisis(user_message):
         return ai_response, False
 
     ai_response = ai_response or ''
+    ai_response = strip_emoji(ai_response)
     country, language = _country_and_language(user)
 
     try:

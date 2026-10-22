@@ -4,6 +4,8 @@ import re
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail
 
+from .models import UserSettings
+
 HEX_COLOR = re.compile(r'^#[0-9a-fA-F]{6}$')
 
 CHOICE_FIELDS = {
@@ -13,6 +15,10 @@ CHOICE_FIELDS = {
 }
 COLOR_FIELDS = ('user_bubble', 'bot_bubble')
 
+AI_PRESETS = ('balanced', 'gentle', 'calm', 'direct', 'upbeat', 'custom')
+AI_EMOJI = ('off', 'rare', 'often')
+AI_LEVEL_FIELDS = ('warmth', 'enthusiasm')
+
 DEFAULTS = {
     'appearance': {
         'theme': 'auto',
@@ -20,6 +26,12 @@ DEFAULTS = {
         'bot_bubble': None,
         'font_size': 'medium',
         'font_family': 'system',
+    },
+    'ai_style': {
+        'preset': 'balanced',
+        'warmth': 3,
+        'enthusiasm': 2,
+        'emoji': 'off',
     },
 }
 
@@ -44,7 +56,26 @@ def _clean_appearance_value(key, value):
     raise _invalid(f'Unknown setting: {key}.')
 
 
-CLEANERS = {'appearance': _clean_appearance_value}
+def _clean_ai_style_value(key, value):
+    if key == 'preset':
+        if isinstance(value, str) and value in AI_PRESETS:
+            return value
+        raise _invalid('Invalid value for preset.')
+    if key in AI_LEVEL_FIELDS:
+        if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= 5:
+            return value
+        raise _invalid(f'Invalid value for {key}.')
+    if key == 'emoji':
+        if isinstance(value, str) and value in AI_EMOJI:
+            return value
+        raise _invalid('Invalid value for emoji.')
+    raise _invalid(f'Unknown setting: {key}.')
+
+
+CLEANERS = {
+    'appearance': _clean_appearance_value,
+    'ai_style': _clean_ai_style_value,
+}
 
 
 def effective_settings(stored):
@@ -80,3 +111,8 @@ def apply_patch(stored, patch):
             current[key] = cleaner(key, value)
         merged[section] = current
     return merged
+
+
+def get_user_settings(user):
+    record = UserSettings.objects.filter(user=user).first()
+    return effective_settings(record.data if record else {})
