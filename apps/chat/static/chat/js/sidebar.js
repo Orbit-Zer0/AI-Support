@@ -246,6 +246,7 @@ function renderHelp(data) {
 }
 
 async function openHelp() {
+  setRailOpen(false);
   const dialog = $('help-dialog');
   $('help-list').replaceChildren();
   $('help-fallback').textContent = '';
@@ -284,4 +285,29 @@ function setUserMenuOpen(open) {
 
 function closeUserMenu() {
   setUserMenuOpen(false);
+}
+
+let railTimer = null;
+
+function isRailOpen() {
+  return $('chat-view').classList.contains('rail-open');
+}
+
+function setRailOpen(open) {
+  clearTimeout(railTimer);
+  $('chat-view').classList.toggle('rail-open', open);
+}
+
+function cancelRailChange() {
+  clearTimeout(railTimer);
+}
+
+function requestRail(open, delay) {
+  clearTimeout(railTimer);
+  if (delay === 0) {
+    setRailOpen(open);
+    return;
+  }
+  if (isRailOpen() === open) return;
+  railTimer = setTimeout(() => setRailOpen(open), delay);
 }

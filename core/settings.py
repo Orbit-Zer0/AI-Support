@@ -152,5 +152,6 @@ REST_FRAMEWORK = {
         'chat_daily': '150/day',
         'chat_title': '30/hour',
         'auth': '30/hour',
+        'settings': '120/hour',
     },
 }

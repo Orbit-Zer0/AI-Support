@@ -41,3 +41,15 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f'{self.user.username}'
+
+class UserSettings(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='ui_settings',
+    )
+    data = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Settings of {self.user.username}'

@@ -4,8 +4,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .throttles import AuthThrottle
-from .models import Country, Language
+from rest_framework.permissions import IsAuthenticated
+from .models import Country, Language, UserSettings
+from .throttles import AuthThrottle, SettingsThrottle
+from .user_settings import apply_patch, effective_settings
 from .serializers import RegisterSerializer
 
 
@@ -67,3 +69,17 @@ class LanguageListView(APIView):
     def get(self, request):
         languages = Language.objects.filter(is_active=True).order_by('code').values('code', 'name')
         return Response(list(languages))
+
+class UserSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [SettingsThrottle]
+
+    def get(self, request):
+        record = UserSettings.objects.filter(user=request.user).first()
+        return Response(effective_settings(record.data if record else {}))
+
+    def patch(self, request):
+        record, _ = UserSettings.objects.get_or_create(user=request.user)
+        record.data = apply_patch(record.data, request.data)
+        record.save(update_fields=['data', 'updated_at'])
+        return Response(effective_settings(record.data))

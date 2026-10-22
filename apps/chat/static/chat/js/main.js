@@ -42,14 +42,27 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-$('btn-profile').addEventListener('click', () => {
-  if (window.matchMedia('(hover: none)').matches) {
-    setUserMenuOpen(!$('user-zone').classList.contains('open'));
-  }
-});
+$('btn-settings-ai').addEventListener('click', () => openSettings('ai'));
+$('btn-settings-appearance').addEventListener('click', () => openSettings('appearance'));
+$('btn-settings-hotkeys').addEventListener('click', () => openSettings('hotkeys'));
+$('btn-profile').addEventListener('click', () => openSettings('profile'));
 
-document.addEventListener('click', (event) => {
-  if (!event.target.closest('#user-zone')) closeUserMenu();
+const rail = $('rail');
+const expandButton = $('chats-expand');
+
+rail.addEventListener('mouseenter', () => requestRail(true, 150));
+rail.addEventListener('mouseleave', () => requestRail(false, 150));
+
+expandButton.addEventListener('mouseenter', () => {
+  if (isRailOpen()) cancelRailChange();
+});
+expandButton.addEventListener('mouseleave', () => requestRail(false, 150));
+
+rail.addEventListener('focusin', (event) => {
+  if (event.target.matches(':focus-visible')) requestRail(true, 0);
+});
+rail.addEventListener('focusout', (event) => {
+  if (!rail.contains(event.relatedTarget)) requestRail(false, 0);
 });
 
 $('btn-help').addEventListener('click', openHelp);
@@ -79,6 +92,8 @@ $('input').addEventListener('input', autoResizeInput);
 currentLang = detectLanguage();
 renderIcons();
 setupContact();
+initSettings();
+syncSettingsControls();
 initPasswordToggles();
 applyTranslations();
 renderSelects();

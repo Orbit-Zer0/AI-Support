@@ -149,6 +149,7 @@ function enterApp() {
   showView('chat');
   refreshChatList();
   maybeShowNotice();
+  loadServerSettings();
 }
 
 function logout(errorKey) {
@@ -156,6 +157,7 @@ function logout(errorKey) {
   document.querySelectorAll('dialog[open]').forEach((dialog) => dialog.close());
   closeSidebarDrawer();
   closeUserMenu();
+  setRailOpen(false);
   resetChat();
   clearChatList();
   hideAllPasswords();

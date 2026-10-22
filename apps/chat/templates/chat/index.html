@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Support</title>
   <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+  <script src="{% static 'chat/js/appearance.js' %}"></script>
 </head>
 <body>
 
@@ -182,6 +183,127 @@
     </div>
   </dialog>
 
+  <dialog id="settings-dialog" class="dialog settings-dialog" aria-labelledby="settings-title">
+    <div class="settings-shell">
+
+      <aside class="settings-nav">
+        <h2 id="settings-title" data-i18n="settings.title"></h2>
+        <div class="settings-search">
+          <span class="search-icon" data-icon="search"></span>
+          <input type="search" id="settings-search" autocomplete="off" data-i18n-placeholder="settings.search">
+        </div>
+        <nav class="settings-tabs" data-i18n-aria-label="settings.sections">
+          <button type="button" class="settings-tab active" data-section="appearance">
+            <span data-icon="palette"></span><span data-i18n="settings.appearance"></span>
+          </button>
+          <button type="button" class="settings-tab" data-section="ai">
+            <span data-icon="sliders"></span><span data-i18n="settings.ai"></span>
+          </button>
+          <button type="button" class="settings-tab" data-section="profile">
+            <span data-icon="user"></span><span data-i18n="settings.profile"></span>
+          </button>
+          <button type="button" class="settings-tab" data-section="hotkeys">
+            <span data-icon="command"></span><span data-i18n="settings.hotkeys"></span>
+          </button>
+        </nav>
+      </aside>
+
+      <section class="settings-content">
+        <div class="settings-topbar">
+          <span id="settings-status" role="status" aria-live="polite"></span>
+          <button type="button" class="icon-btn" id="settings-close" data-icon="x"
+                  data-i18n-aria-label="btn.close"></button>
+        </div>
+
+        <div class="settings-results" id="settings-results" hidden></div>
+
+        <div class="settings-panel" data-section="appearance">
+          <h3 data-i18n="settings.appearance"></h3>
+
+          <div class="setting" data-setting="theme">
+            <fieldset class="choices">
+              <legend data-i18n="theme.label"></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" name="theme" value="light"><span data-i18n="theme.light"></span></label>
+                <label class="choice"><input type="radio" name="theme" value="dark"><span data-i18n="theme.dark"></span></label>
+                <label class="choice"><input type="radio" name="theme" value="auto"><span data-i18n="theme.auto"></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="setting" data-setting="colors">
+            <h4 data-i18n="colors.title"></h4>
+            <div class="color-row">
+              <label for="color-user" data-i18n="colors.user"></label>
+              <input type="color" id="color-user" data-color="user_bubble">
+              <span class="default-tag" data-for="user_bubble" data-i18n="colors.default"></span>
+              <button type="button" class="link-button" data-reset="user_bubble" data-i18n="colors.reset"></button>
+            </div>
+            <div class="color-row">
+              <label for="color-bot" data-i18n="colors.bot"></label>
+              <input type="color" id="color-bot" data-color="bot_bubble">
+              <span class="default-tag" data-for="bot_bubble" data-i18n="colors.default"></span>
+              <button type="button" class="link-button" data-reset="bot_bubble" data-i18n="colors.reset"></button>
+            </div>
+            <p class="hint" data-i18n="colors.crisisNote"></p>
+          </div>
+
+          <div class="setting" data-setting="font-size">
+            <fieldset class="choices">
+              <legend data-i18n="font.size"></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" name="font_size" value="small"><span data-i18n="size.small"></span></label>
+                <label class="choice"><input type="radio" name="font_size" value="medium"><span data-i18n="size.medium"></span></label>
+                <label class="choice"><input type="radio" name="font_size" value="large"><span data-i18n="size.large"></span></label>
+                <label class="choice"><input type="radio" name="font_size" value="xlarge"><span data-i18n="size.xlarge"></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="setting" data-setting="font-family">
+            <fieldset class="choices">
+              <legend data-i18n="font.family"></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" name="font_family" value="system"><span data-i18n="font.system"></span></label>
+                <label class="choice" data-font-sample="serif"><input type="radio" name="font_family" value="serif"><span data-i18n="font.serif"></span></label>
+                <label class="choice" data-font-sample="mono"><input type="radio" name="font_family" value="mono"><span data-i18n="font.mono"></span></label>
+                <label class="choice" data-font-sample="readable"><input type="radio" name="font_family" value="readable"><span data-i18n="font.readable"></span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="settings-preview" aria-hidden="true">
+            <div class="message message-user" data-i18n="preview.user"></div>
+            <div class="message message-bot"><div class="message-content" data-i18n="preview.bot"></div></div>
+            <div class="message message-bot message-crisis"><div class="message-content" data-i18n="preview.crisis"></div></div>
+          </div>
+
+          <button type="button" class="secondary-btn" id="settings-reset" data-i18n="settings.reset"></button>
+        </div>
+
+        <div class="settings-panel" data-section="ai" hidden>
+          <h3 data-i18n="settings.ai"></h3>
+          <p class="settings-soon" data-i18n="settings.soon"></p>
+        </div>
+
+        <div class="settings-panel" data-section="profile" hidden>
+          <h3 data-i18n="settings.profile"></h3>
+          <p class="settings-soon" data-i18n="settings.soon"></p>
+          <div class="setting" data-setting="logout">
+            <button type="button" class="danger-btn" id="settings-logout">
+              <span data-icon="logout"></span><span data-i18n="btn.logout"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-panel" data-section="hotkeys" hidden>
+          <h3 data-i18n="settings.hotkeys"></h3>
+          <p class="settings-soon" data-i18n="settings.soon"></p>
+        </div>
+      </section>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/marked@17.0.6/lib/marked.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.14/dist/purify.min.js"></script>
 
@@ -190,6 +312,7 @@
   <script src="{% static 'chat/js/auth.js' %}"></script>
   <script src="{% static 'chat/js/chat.js' %}"></script>
   <script src="{% static 'chat/js/sidebar.js' %}"></script>
+  <script src="{% static 'chat/js/settings.js' %}"></script>
   <script src="{% static 'chat/js/main.js' %}"></script>
 </body>
 </html>

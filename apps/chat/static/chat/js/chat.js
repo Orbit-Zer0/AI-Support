@@ -43,13 +43,80 @@ function setChatTitle(text) {
   $('chat-title').textContent = text || '';
 }
 
-function addBotMessage(text) {
+function addBotMessage(text, { copy = true } = {}) {
   const element = document.createElement('div');
   element.className = 'message message-bot';
-  renderBotText(element, text);
+
+  const content = document.createElement('div');
+  content.className = 'message-content';
+  renderBotText(content, text);
+  element.append(content);
+
+  if (copy) element.append(buildCopyTools(text));
+
   $('messages').append(element);
   scrollToBottom();
   return element;
+}
+
+function fallbackCopy(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.append(area);
+  area.select();
+
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch (error) {
+    ok = false;
+  }
+  area.remove();
+  return ok;
+}
+
+function setCopyButtonLabel(button, label) {
+  button.title = label;
+  button.setAttribute('aria-label', label);
+}
+
+async function copyText(text, button) {
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(text);
+    ok = true;
+  } catch (error) {
+    ok = fallbackCopy(text);
+  }
+
+  button.dataset.icon = ok ? 'check' : 'x';
+  renderIcons(button);
+  setCopyButtonLabel(button, ok ? t('btn.copied') : t('btn.copyFailed'));
+
+  setTimeout(() => {
+    button.dataset.icon = 'copy';
+    renderIcons(button);
+    setCopyButtonLabel(button, t('btn.copy'));
+  }, 1500);
+}
+
+function buildCopyTools(text) {
+  const tools = document.createElement('div');
+  tools.className = 'message-tools';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'icon-btn copy-btn';
+  button.dataset.icon = 'copy';
+  setCopyButtonLabel(button, t('btn.copy'));
+  renderIcons(button);
+  button.addEventListener('click', () => copyText(text, button));
+
+  tools.append(button);
+  return tools;
 }
 
 function addUserMessage(text) {
@@ -132,7 +199,7 @@ function resetChat() {
   conversationId = null;
   setSending(false);
   $('messages').replaceChildren();
-  addBotMessage(t('welcome'));
+  addBotMessage(t('welcome'), { copy: false });
   setChatTitle('');
   updateActiveChat();
 }
