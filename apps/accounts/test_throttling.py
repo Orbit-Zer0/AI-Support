@@ -21,7 +21,7 @@ class AuthThrottleTests(APITestCase):
         cache.clear()
 
     def test_login_attempts_are_limited(self):
-        payload = {'username': 'nobody', 'password': 'wrong'}
+        payload = {'login': 'nobody', 'password': 'wrong'}
         with patch.dict(AuthThrottle.THROTTLE_RATES, {'auth': '2/min'}):
             first = self.client.post(reverse('login'), payload, format='json')
             second = self.client.post(reverse('login'), payload, format='json')

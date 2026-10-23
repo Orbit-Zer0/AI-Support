@@ -6,15 +6,26 @@ $('ui-language').addEventListener('change', (event) => {
   setLanguage(event.target.value);
 });
 
-$('login-form').addEventListener('submit', (event) => {
-  event.preventDefault();
-  submitAuth(event.target, '/api/login/', $('login-error'));
+for (const kind of ['login', 'register', 'forgot', 'reset']) {
+  $(`${kind}-form`).addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitAuth(kind);
+  });
+}
+
+$('forgot-link').addEventListener('click', () => {
+  setAuthNotice(null);
+  showAuthForm('forgot');
 });
 
-$('register-form').addEventListener('submit', (event) => {
-  event.preventDefault();
-  submitAuth(event.target, '/api/register/', $('register-error'));
-});
+for (const id of ['forgot-back', 'reset-back']) {
+  $(id).addEventListener('click', () => {
+    pendingReset = null;
+    switchTab('login');
+  });
+}
+
+$('email-resend').addEventListener('click', resendVerification);
 
 
 $('logout').addEventListener('click', () => logout());
@@ -42,10 +53,6 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-$('btn-settings-ai').addEventListener('click', () => openSettings('ai'));
-$('btn-settings-appearance').addEventListener('click', () => openSettings('appearance'));
-$('btn-settings-hotkeys').addEventListener('click', () => openSettings('hotkeys'));
-$('btn-profile').addEventListener('click', () => openSettings('profile'));
 
 const rail = $('rail');
 const expandButton = $('chats-expand');
@@ -64,6 +71,13 @@ rail.addEventListener('focusin', (event) => {
 rail.addEventListener('focusout', (event) => {
   if (!rail.contains(event.relatedTarget)) requestRail(false, 0);
 });
+
+
+$('btn-settings-ai').addEventListener('click', () => openSettings('ai'));
+$('btn-settings-appearance').addEventListener('click', () => openSettings('appearance'));
+$('btn-settings-hotkeys').addEventListener('click', () => openSettings('hotkeys'));
+$('btn-profile').addEventListener('click', () => openSettings('profile'));
+
 
 $('btn-help').addEventListener('click', openHelp);
 $('help-close').addEventListener('click', () => $('help-dialog').close());
@@ -99,9 +113,4 @@ applyTranslations();
 renderSelects();
 loadOptions();
 restoreSidebarState();
-
-if (localStorage.getItem(TOKEN_KEY)) {
-  enterApp();
-} else {
-  showView('auth');
-}
+start();

@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Support</title>
   <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'chat/css/accounts.css' %}">
   <script src="{% static 'chat/js/appearance.js' %}"></script>
 </head>
-<body>
+<body data-contact-email="{{ contact_email }}">
 
   <section class="auth" id="auth-view" hidden>
     <div class="auth-top">
@@ -16,15 +17,17 @@
       <select id="ui-language" class="lang-switch" data-i18n-aria-label="label.language"></select>
     </div>
 
-    <div class="tabs">
+    <p class="notice-box" id="auth-notice" role="status" hidden></p>
+
+    <div class="tabs" id="auth-tabs">
       <button type="button" class="tab active" data-tab="login" data-i18n="tab.login"></button>
       <button type="button" class="tab" data-tab="register" data-i18n="tab.register"></button>
     </div>
 
     <form class="form" id="login-form">
       <div class="field">
-        <label for="login-username" data-i18n="label.username"></label>
-        <input id="login-username" name="username" autocomplete="username" required>
+        <label for="login-id" data-i18n="label.login"></label>
+        <input id="login-id" name="login" autocomplete="username" required>
       </div>
       <div class="field">
         <label for="login-password" data-i18n="label.password"></label>
@@ -34,12 +37,17 @@
       </div>
       <p class="form-error" id="login-error" role="alert"></p>
       <button type="submit" data-i18n="btn.login"></button>
+      <button type="button" class="link-button auth-link" id="forgot-link" data-i18n="auth.forgot"></button>
     </form>
 
     <form class="form" id="register-form" hidden>
       <div class="field">
         <label for="reg-username" data-i18n="label.username"></label>
         <input id="reg-username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="reg-email" data-i18n="label.email"></label>
+        <input id="reg-email" name="email" type="email" autocomplete="email" required>
       </div>
       <div class="field">
         <label for="reg-password" data-i18n="label.passwordNew"></label>
@@ -60,6 +68,36 @@
       <p class="hint" data-i18n="hint.language"></p>
       <p class="form-error" id="register-error" role="alert"></p>
       <button type="submit" data-i18n="btn.register"></button>
+    </form>
+
+    <form class="form" id="forgot-form" hidden>
+      <p class="hint" data-i18n="forgot.intro"></p>
+      <div class="field">
+        <label for="forgot-email" data-i18n="label.email"></label>
+        <input id="forgot-email" name="email" type="email" autocomplete="email" required>
+      </div>
+      <p class="form-error" id="forgot-error" role="alert"></p>
+      <button type="submit" data-i18n="btn.sendLink"></button>
+      <button type="button" class="link-button auth-link" id="forgot-back" data-i18n="auth.back"></button>
+    </form>
+
+    <form class="form" id="reset-form" hidden>
+      <p class="hint" data-i18n="reset.intro"></p>
+      <div class="field">
+        <label for="reset-password" data-i18n="label.passwordNew"></label>
+        <div class="password-field">
+          <input id="reset-password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="reset-password-confirm" data-i18n="label.passwordConfirm"></label>
+        <div class="password-field">
+          <input id="reset-password-confirm" name="password_confirm" type="password" autocomplete="new-password" required>
+        </div>
+      </div>
+      <p class="form-error" id="reset-error" role="alert"></p>
+      <button type="submit" data-i18n="btn.setPassword"></button>
+      <button type="button" class="link-button auth-link" id="reset-back" data-i18n="auth.back"></button>
     </form>
   </section>
 
@@ -144,7 +182,10 @@
                 data-i18n-title="chats.expand" data-i18n-aria-label="chats.expand"></button>
         <h2 class="chat-title" id="chat-title"></h2>
       </div>
-
+      <div class="banner" id="email-banner" hidden>
+        <span id="email-banner-text"></span>
+        <button type="button" class="link-button" id="email-resend" data-i18n="email.resend"></button>
+      </div>
       <div class="messages" id="messages" aria-live="polite"></div>
 
       <div class="composer-bar">
@@ -153,7 +194,7 @@
           <button type="button" id="send" data-i18n="btn.send"></button>
         </div>
         <p class="disclaimer" data-i18n="disclaimer.text"></p>
-        <p class="contact">
+        <p class="contact" id="contact-line">
           <span data-i18n="contact.text"></span>
           <a id="contact-link"></a>
         </p>

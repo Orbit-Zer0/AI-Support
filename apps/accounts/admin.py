@@ -18,4 +18,6 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'country', 'language', 'created_at')
+    list_display = ('user', 'email', 'email_verified', 'country', 'language', 'created_at')
+    list_filter = ('email_verified',)
+    search_fields = ('user__username', 'email')

@@ -5,3 +5,6 @@ class AuthThrottle(AnonRateThrottle):
 
 class SettingsThrottle(UserRateThrottle):
     scope = 'settings'
+
+class EmailResendThrottle(UserRateThrottle):
+    scope = 'email_resend'

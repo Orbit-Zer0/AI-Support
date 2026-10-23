@@ -22,7 +22,18 @@ GEMINI_FALLBACK_MODELS = [
     if name.strip()
 ]
 
-# SECURITY WARNING: don't run with debug turned on in production!
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
+CONTACT_EMAIL = os.getenv('CONTACT_EMAIL', '').strip()
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'AI Support <noreply@localhost>')
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'apps.accounts.dev_email.ReadableConsoleEmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+
+PASSWORD_RESET_TIMEOUT = 60 * 60
+
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
@@ -153,5 +164,8 @@ REST_FRAMEWORK = {
         'chat_title': '30/hour',
         'auth': '30/hour',
         'settings': '120/hour',
+        'email_resend': '5/hour',
+        'sensitive': '10/hour',
+        'export': '10/hour',
     },
 }

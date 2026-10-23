@@ -1,0 +1,28 @@
+.notice-box {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--active);
+  border-radius: 10px;
+}
+
+.notice-box.error {
+  color: var(--error);
+  background: var(--error-bg);
+}
+
+.auth-link { align-self: center; font-size: 0.9rem; }
+
+.banner {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  background: var(--active);
+  border-bottom: 1px solid var(--border);
+}

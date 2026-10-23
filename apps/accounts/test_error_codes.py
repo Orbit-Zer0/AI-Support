@@ -6,6 +6,7 @@ class ErrorCodesTests(APITestCase):
     def register(self, **overrides):
         data = {
             'username': 'newuser',
+            'email': 'newuser@example.com',
             'password': 'Str0ng-pass-789',
             'country': 'KG',
             'language': 'en',
@@ -34,7 +35,7 @@ class ErrorCodesTests(APITestCase):
 
     def test_login_failure_code(self):
         response = self.client.post(
-            reverse('login'), {'username': 'nobody', 'password': 'x'}, format='json'
+            reverse('login'), {'login': 'nobody', 'password': 'x'}, format='json'
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['codes']['non_field_errors'], ['authorization'])

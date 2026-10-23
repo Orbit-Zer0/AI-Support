@@ -24,7 +24,9 @@ async function api(path, options = {}) {
 const ERROR_ALIASES = { blank: 'required', min_length: 'password_too_short' };
 
 function describeError(field, rawCode) {
-  const code = ERROR_ALIASES[rawCode] || rawCode;
+  let code = ERROR_ALIASES[rawCode] || rawCode;
+  if (rawCode === 'invalid' && field === 'email') code = 'invalid_email';
+
   const key = 'err.' + code;
   const text = t(key);
   if (text === key) return t('err.generic');
@@ -101,10 +103,15 @@ function renderIcons(root = document) {
   }
 }
 
-const CONTACT_EMAIL = 'support@example.com';
-
 function setupContact() {
+  const email = (document.body.dataset.contactEmail || '').trim();
+  const line = $('contact-line');
+  if (!/^[^\s@]+@[^\s@]+$/.test(email)) {
+    line.hidden = true;
+    return;
+  }
   const link = $('contact-link');
-  link.href = 'mailto:' + CONTACT_EMAIL;
-  link.textContent = CONTACT_EMAIL;
+  link.href = 'mailto:' + email;
+  link.textContent = email;
+  line.hidden = false;
 }
