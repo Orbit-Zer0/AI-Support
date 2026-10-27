@@ -82,14 +82,6 @@ class LoginView(APIView):
         token, _ = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, **account_data(user)})
 
-
-class AccountView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response(account_data(request.user))
-
-
 class VerifyEmailView(APIView):
     authentication_classes = []
     throttle_classes = [AuthThrottle]

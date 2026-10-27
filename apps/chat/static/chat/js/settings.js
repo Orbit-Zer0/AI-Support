@@ -13,7 +13,12 @@ const SETTINGS_INDEX = [
   { id: 'ai-preset', section: 'ai', label: 'ai.preset', keywords: 'kw.aiPreset' },
   { id: 'ai-sliders', section: 'ai', label: 'ai.custom', keywords: 'kw.aiTone' },
   { id: 'ai-emoji', section: 'ai', label: 'ai.emoji', keywords: 'kw.aiEmoji' },
-  { id: 'logout', section: 'profile', label: 'btn.logout', keywords: 'kw.logout' },
+  { id: 'account', section: 'profile', label: 'profile.account', keywords: 'kw.account' },
+  { id: 'locale', section: 'profile', label: 'profile.locale', keywords: 'kw.locale' },
+  { id: 'email-change', section: 'profile', label: 'profile.emailChange', keywords: 'kw.email' },
+  { id: 'password-change', section: 'profile', label: 'profile.password', keywords: 'kw.password' },
+  { id: 'data', section: 'profile', label: 'profile.data', keywords: 'kw.data' },
+  { id: 'danger', section: 'profile', label: 'profile.danger', keywords: 'kw.danger' },
 ];
 
 let activeSection = 'appearance';
@@ -201,6 +206,7 @@ function syncAppearanceControls() {
 function syncSettingsControls() {
   syncAppearanceControls();
   syncAiControls();
+  syncProfileControls();
 }
 
 

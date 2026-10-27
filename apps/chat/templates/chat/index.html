@@ -371,11 +371,99 @@
 
         <div class="settings-panel" data-section="profile" hidden>
           <h3 data-i18n="settings.profile"></h3>
-          <p class="settings-soon" data-i18n="settings.soon"></p>
-          <div class="setting" data-setting="logout">
-            <button type="button" class="danger-btn" id="settings-logout">
-              <span data-icon="logout"></span><span data-i18n="btn.logout"></span>
-            </button>
+
+          <div class="setting" data-setting="account">
+            <h4 data-i18n="profile.account"></h4>
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.username"></span>
+              <span id="profile-username"></span>
+            </div>
+            <div class="info-row">
+              <span class="info-label" data-i18n="label.email"></span>
+              <span id="profile-email"></span>
+            </div>
+            <div class="info-row">
+              <span class="info-label"></span>
+              <span class="status-tag" id="profile-email-status" hidden></span>
+              <button type="button" class="link-button" id="profile-resend" data-i18n="email.resend" hidden></button>
+            </div>
+          </div>
+
+          <div class="setting" data-setting="locale">
+            <h4 data-i18n="profile.locale"></h4>
+            <div class="field">
+              <label for="profile-country" data-i18n="label.country"></label>
+              <select id="profile-country"></select>
+            </div>
+            <div class="field">
+              <label for="profile-language" data-i18n="label.language"></label>
+              <select id="profile-language"></select>
+            </div>
+            <p class="hint" data-i18n="profile.locale.note"></p>
+          </div>
+
+          <div class="setting" data-setting="email-change">
+            <h4 data-i18n="profile.emailChange"></h4>
+            <form class="form" id="email-form">
+              <div class="field">
+                <label for="email-new" data-i18n="label.newEmail"></label>
+                <input id="email-new" name="email" type="email" autocomplete="email" required>
+              </div>
+              <div class="field">
+                <label for="email-password" data-i18n="label.currentPassword"></label>
+                <div class="password-field">
+                  <input id="email-password" name="current_password" type="password" autocomplete="current-password" required>
+                </div>
+              </div>
+              <p class="hint" data-i18n="profile.emailChange.note"></p>
+              <p class="form-error" id="email-form-error" role="alert"></p>
+              <p class="form-ok" id="email-form-ok" role="status"></p>
+              <button type="submit" class="secondary-btn" data-i18n="btn.save"></button>
+            </form>
+          </div>
+
+          <div class="setting" data-setting="password-change">
+            <h4 data-i18n="profile.password"></h4>
+            <form class="form" id="password-form">
+              <div class="field">
+                <label for="password-current" data-i18n="label.currentPassword"></label>
+                <div class="password-field">
+                  <input id="password-current" name="current_password" type="password" autocomplete="current-password" required>
+                </div>
+              </div>
+              <div class="field">
+                <label for="password-new" data-i18n="label.passwordNew"></label>
+                <div class="password-field">
+                  <input id="password-new" name="new_password" type="password" autocomplete="new-password" minlength="8" required>
+                </div>
+              </div>
+              <div class="field">
+                <label for="password-new-confirm" data-i18n="label.passwordConfirm"></label>
+                <div class="password-field">
+                  <input id="password-new-confirm" name="new_password_confirm" type="password" autocomplete="new-password" required>
+                </div>
+              </div>
+              <p class="hint" data-i18n="profile.password.note"></p>
+              <p class="form-error" id="password-form-error" role="alert"></p>
+              <p class="form-ok" id="password-form-ok" role="status"></p>
+              <button type="submit" class="secondary-btn" data-i18n="btn.save"></button>
+            </form>
+          </div>
+
+          <div class="setting" data-setting="data">
+            <h4 data-i18n="profile.data"></h4>
+            <p class="hint" data-i18n="profile.export.note"></p>
+            <p class="form-error" id="export-error" role="alert"></p>
+            <button type="button" class="secondary-btn" id="export-btn" data-i18n="profile.export"></button>
+          </div>
+
+          <div class="setting" data-setting="danger">
+            <h4 data-i18n="profile.danger"></h4>
+            <div class="button-row">
+              <button type="button" class="secondary-btn" id="settings-logout" data-i18n="btn.logout"></button>
+              <button type="button" class="secondary-btn" id="logout-all" data-i18n="btn.logoutAll"></button>
+              <button type="button" class="danger-btn" id="delete-account-btn" data-i18n="btn.deleteAccount"></button>
+            </div>
           </div>
         </div>
 
@@ -387,6 +475,24 @@
     </div>
   </dialog>
 
+  <dialog id="delete-dialog" class="dialog" aria-labelledby="delete-title">
+    <form class="dialog-body form" id="delete-form">
+      <h2 id="delete-title" data-i18n="delete.title"></h2>
+      <p data-i18n="delete.text"></p>
+      <div class="field">
+        <label for="delete-password" data-i18n="label.currentPassword"></label>
+        <div class="password-field">
+          <input id="delete-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+      </div>
+      <p class="form-error" id="delete-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button type="button" class="secondary-btn" id="delete-cancel" data-i18n="btn.cancel"></button>
+        <button type="submit" class="danger-btn" data-i18n="btn.deleteForever"></button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/marked@17.0.6/lib/marked.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.14/dist/purify.min.js"></script>
 
@@ -396,6 +502,7 @@
   <script src="{% static 'chat/js/chat.js' %}"></script>
   <script src="{% static 'chat/js/sidebar.js' %}"></script>
   <script src="{% static 'chat/js/settings.js' %}"></script>
+  <script src="{% static 'chat/js/profile.js' %}"></script>
   <script src="{% static 'chat/js/main.js' %}"></script>
 </body>
 </html>

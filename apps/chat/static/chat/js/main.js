@@ -107,6 +107,7 @@ currentLang = detectLanguage();
 renderIcons();
 setupContact();
 initSettings();
+initProfile();
 syncSettingsControls();
 initPasswordToggles();
 applyTranslations();

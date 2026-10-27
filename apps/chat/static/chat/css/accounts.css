@@ -26,3 +26,61 @@
   background: var(--active);
   border-bottom: 1px solid var(--border);
 }
+
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 0.95rem;
+}
+
+.info-label { flex: 0 0 150px; color: var(--muted); }
+
+.status-tag {
+  padding: 2px 10px;
+  font-size: 0.85rem;
+  background: var(--hover);
+  border-radius: 999px;
+}
+
+.status-tag.ok { background: var(--active); }
+.status-tag.warn { color: var(--error); background: var(--error-bg); }
+
+.form-ok { min-height: 1.2em; margin: 0; font-size: 0.9rem; color: #16a34a; }
+
+.setting .field select {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 12px;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.setting .form { max-width: 380px; }
+.setting .form .secondary-btn { align-self: flex-start; margin-top: 4px; }
+
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.button-row .secondary-btn,
+.button-row .danger-btn { margin-top: 0; }
+
+.dialog-actions { gap: 8px; }
+
+.dialog-actions .secondary-btn {
+  margin-top: 0;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.dialog-actions .danger-btn {
+  height: auto;
+  padding: 9px 18px;
+  color: #fff;
+  background: #dc2626;
+  border-radius: 10px;
+}
+
+.dialog-actions .danger-btn:hover { background: #b91c1c; }

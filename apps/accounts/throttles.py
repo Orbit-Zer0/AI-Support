@@ -8,3 +8,9 @@ class SettingsThrottle(UserRateThrottle):
 
 class EmailResendThrottle(UserRateThrottle):
     scope = 'email_resend'
+
+class SensitiveActionThrottle(UserRateThrottle):
+    scope = 'sensitive'
+
+class ExportThrottle(UserRateThrottle):
+    scope = 'export'

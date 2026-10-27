@@ -48,6 +48,7 @@ function setLanguage(code) {
   localStorage.setItem(LANG_KEY, currentLang);
   applyTranslations();
   renderSelects();
+  syncProfileControls();
 }
 
 async function loadOptions() {
@@ -242,6 +243,7 @@ async function refreshAccount() {
     accountInfo = result.data;
     $('whoami').textContent = accountInfo.username;
     updateEmailBanner();
+    syncProfileControls();
   } catch (error) {
     console.error(error);
   }

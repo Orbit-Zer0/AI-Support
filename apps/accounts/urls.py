@@ -1,7 +1,14 @@
 from django.urls import path
 
-from .views import (
+from .account_views import (
     AccountView,
+    ChangeEmailView,
+    ChangePasswordView,
+    DeleteAccountView,
+    ExportDataView,
+    LogoutAllView,
+)
+from .views import (
     CountryListView,
     ForgotPasswordView,
     LanguageListView,
@@ -19,9 +26,14 @@ urlpatterns = [
     path('countries/', CountryListView.as_view(), name='countries'),
     path('languages/', LanguageListView.as_view(), name='languages'),
     path('settings/', UserSettingsView.as_view(), name='user-settings'),
-    path('account/', AccountView.as_view(), name='account'),
     path('email/verify/', VerifyEmailView.as_view(), name='email-verify'),
     path('email/resend/', ResendVerificationView.as_view(), name='email-resend'),
     path('password/forgot/', ForgotPasswordView.as_view(), name='password-forgot'),
     path('password/reset/', ResetPasswordView.as_view(), name='password-reset'),
+    path('account/', AccountView.as_view(), name='account'),
+    path('account/email/', ChangeEmailView.as_view(), name='account-email'),
+    path('account/password/', ChangePasswordView.as_view(), name='account-password'),
+    path('account/export/', ExportDataView.as_view(), name='account-export'),
+    path('account/logout-all/', LogoutAllView.as_view(), name='account-logout-all'),
+    path('account/delete/', DeleteAccountView.as_view(), name='account-delete'),
 ]
