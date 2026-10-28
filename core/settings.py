@@ -170,5 +170,6 @@ REST_FRAMEWORK = {
         'email_resend': '5/hour',
         'sensitive': '10/hour',
         'export': '10/hour',
+        'import': '10/hour',
     },
 }

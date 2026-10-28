@@ -108,6 +108,7 @@ renderIcons();
 setupContact();
 initSettings();
 initProfile();
+initTransfer();
 syncSettingsControls();
 initPasswordToggles();
 applyTranslations();

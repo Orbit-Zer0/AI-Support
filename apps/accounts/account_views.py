@@ -1,13 +1,11 @@
 import logging
 
 from django.db import transaction
-from django.utils import timezone
+from django.http import HttpResponse
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from apps.chat.models import Conversation
 
 from .account_serializers import (
     AccountUpdateSerializer,
@@ -15,10 +13,16 @@ from .account_serializers import (
     ChangePasswordSerializer,
     DeleteAccountSerializer,
 )
+from .data_transfer import (
+    MAX_IMPORT_BYTES,
+    ImportDataError,
+    build_export,
+    import_conversations,
+    render_readable_export,
+)
 from .emails import send_verification_email
-from .models import UserProfile, UserSettings
-from .throttles import ExportThrottle, SensitiveActionThrottle
-from .user_settings import effective_settings
+from .models import UserProfile
+from .throttles import ExportThrottle, ImportThrottle, SensitiveActionThrottle
 from .views import account_data
 
 logger = logging.getLogger(__name__)
@@ -31,38 +35,11 @@ def get_or_create_profile(user):
         return UserProfile.objects.create(user=user)
 
 
-def build_export(user):
-    profile = getattr(user, 'profile', None)
-    record = UserSettings.objects.filter(user=user).first()
-
-    conversations = []
-    queryset = Conversation.objects.filter(user=user).order_by('id').prefetch_related('messages')
-    for conversation in queryset:
-        messages = sorted(conversation.messages.all(), key=lambda message: message.id)
-        conversations.append({
-            'id': conversation.id,
-            'title': conversation.title,
-            'created_at': conversation.created_at.isoformat(),
-            'summary': conversation.summary,
-            'messages': [
-                {
-                    'role': message.role,
-                    'content': message.content,
-                    'created_at': message.created_at.isoformat(),
-                }
-                for message in messages
-            ],
-        })
-
-    return {
-        'exported_at': timezone.now().isoformat(),
-        'account': {
-            **account_data(user),
-            'created_at': profile.created_at.isoformat() if profile else None,
-        },
-        'settings': effective_settings(record.data if record else {}),
-        'conversations': conversations,
-    }
+def _content_length(request):
+    try:
+        return int(request.META.get('CONTENT_LENGTH') or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 class AccountView(APIView):
@@ -139,6 +116,44 @@ class ExportDataView(APIView):
         response = Response(build_export(request.user))
         response['Content-Disposition'] = 'attachment; filename="ai-support-export.json"'
         return response
+
+
+class ExportReadableView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ExportThrottle]
+
+    def get(self, request):
+        response = HttpResponse(
+            render_readable_export(request.user),
+            content_type='text/html; charset=utf-8',
+        )
+        response['Content-Disposition'] = 'attachment; filename="ai-support-chats.html"'
+        response['X-Content-Type-Options'] = 'nosniff'
+        return response
+
+
+class ImportDataView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ImportThrottle]
+
+    def post(self, request):
+        if _content_length(request) > MAX_IMPORT_BYTES:
+            return Response(
+                {'error': 'The file is too large.', 'code': 'import_too_large'}, status=413
+            )
+
+        try:
+            payload = request.data
+        except RecursionError:
+            return Response(
+                {'error': 'Invalid import file.', 'code': 'import_invalid'}, status=400
+            )
+
+        try:
+            result = import_conversations(request.user, payload)
+        except ImportDataError as exc:
+            return Response({'error': 'Invalid import file.', 'code': exc.code}, status=400)
+        return Response(result)
 
 
 class LogoutAllView(APIView):

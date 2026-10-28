@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class Conversation(models.Model):
@@ -10,7 +11,7 @@ class Conversation(models.Model):
         null=True,
         blank=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=80, blank=True, default='')
     summary = models.TextField(blank=True, default='')
     summarized_until = models.PositiveBigIntegerField(default=0)
@@ -29,7 +30,7 @@ class Message(models.Model):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ['id']

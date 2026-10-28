@@ -14,3 +14,6 @@ class SensitiveActionThrottle(UserRateThrottle):
 
 class ExportThrottle(UserRateThrottle):
     scope = 'export'
+
+class ImportThrottle(UserRateThrottle):
+    scope = 'import'

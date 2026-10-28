@@ -451,10 +451,22 @@
           </div>
 
           <div class="setting" data-setting="data">
-            <h4 data-i18n="profile.data"></h4>
-            <p class="hint" data-i18n="profile.export.note"></p>
+            <h4 data-i18n="profile.exportTitle"></h4>
+            <p class="hint" data-i18n="profile.exportHelp"></p>
             <p class="form-error" id="export-error" role="alert"></p>
-            <button type="button" class="secondary-btn" id="export-btn" data-i18n="profile.export"></button>
+            <div class="button-row">
+              <button type="button" class="secondary-btn" id="export-readable-btn" data-i18n="profile.exportReadable"></button>
+              <button type="button" class="secondary-btn" id="export-btn" data-i18n="profile.exportJson"></button>
+            </div>
+          </div>
+
+          <div class="setting" data-setting="import">
+            <h4 data-i18n="profile.importTitle"></h4>
+            <p class="hint" data-i18n="profile.import.note"></p>
+            <p class="form-error" id="import-error" role="alert"></p>
+            <p class="form-ok" id="import-ok" role="status"></p>
+            <button type="button" class="secondary-btn" id="import-btn" data-i18n="profile.import"></button>
+            <input type="file" id="import-input" accept=".json,application/json" hidden>
           </div>
 
           <div class="setting" data-setting="danger">
@@ -503,6 +515,7 @@
   <script src="{% static 'chat/js/sidebar.js' %}"></script>
   <script src="{% static 'chat/js/settings.js' %}"></script>
   <script src="{% static 'chat/js/profile.js' %}"></script>
+  <script src="{% static 'chat/js/transfer.js' %}"></script>
   <script src="{% static 'chat/js/main.js' %}"></script>
 </body>
 </html>
