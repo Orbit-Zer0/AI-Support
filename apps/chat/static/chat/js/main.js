@@ -109,6 +109,7 @@ setupContact();
 initSettings();
 initProfile();
 initTransfer();
+initAvatar()
 syncSettingsControls();
 initPasswordToggles();
 applyTranslations();

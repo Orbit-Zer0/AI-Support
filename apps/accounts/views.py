@@ -29,12 +29,14 @@ FORGOT_COOLDOWN_SECONDS = 60
 
 def account_data(user):
     profile = getattr(user, 'profile', None)
+    avatar_url = profile.avatar.url if profile and profile.avatar else None
     return {
         'username': user.username,
         'email': profile.email if profile else '',
         'email_verified': bool(profile and profile.email_verified),
         'country': profile.country_id if profile else None,
         'language': profile.language_id if profile else None,
+        'avatar_url': avatar_url,
     }
 
 

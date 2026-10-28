@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Support</title>
   <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'chat/css/profile.css' %}">
   <link rel="stylesheet" href="{% static 'chat/css/accounts.css' %}">
   <script src="{% static 'chat/js/appearance.js' %}"></script>
 </head>
@@ -371,6 +372,19 @@
 
         <div class="settings-panel" data-section="profile" hidden>
           <h3 data-i18n="settings.profile"></h3>
+          <div class="setting" data-setting="avatar">
+            <h4 data-i18n="profile.avatar"></h4>
+            <div class="avatar-row">
+              <span class="avatar avatar-large" id="profile-avatar" aria-hidden="true"></span>
+              <div class="avatar-actions">
+                <button type="button" class="secondary-btn" id="avatar-upload" data-i18n="profile.avatar.upload"></button>
+                <button type="button" class="link-button" id="avatar-remove" data-i18n="profile.avatar.remove" hidden></button>
+                <input type="file" id="avatar-input" accept="image/jpeg,image/png,image/webp" hidden>
+              </div>
+            </div>
+            <p class="hint" data-i18n="profile.avatar.note"></p>
+            <p class="form-error" id="avatar-error" role="alert"></p>
+          </div>
 
           <div class="setting" data-setting="account">
             <h4 data-i18n="profile.account"></h4>
@@ -516,6 +530,7 @@
   <script src="{% static 'chat/js/settings.js' %}"></script>
   <script src="{% static 'chat/js/profile.js' %}"></script>
   <script src="{% static 'chat/js/transfer.js' %}"></script>
+  <script src="{% static 'chat/js/avatar.js' %}"></script>
   <script src="{% static 'chat/js/main.js' %}"></script>
 </body>
 </html>

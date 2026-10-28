@@ -40,6 +40,7 @@ class UserProfile(models.Model):
     )
     email = models.EmailField(blank=True, default='')
     email_verified = models.BooleanField(default=False)
+    avatar = models.ImageField(upload_to='avatars/', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

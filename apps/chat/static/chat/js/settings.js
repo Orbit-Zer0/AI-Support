@@ -13,11 +13,13 @@ const SETTINGS_INDEX = [
   { id: 'ai-preset', section: 'ai', label: 'ai.preset', keywords: 'kw.aiPreset' },
   { id: 'ai-sliders', section: 'ai', label: 'ai.custom', keywords: 'kw.aiTone' },
   { id: 'ai-emoji', section: 'ai', label: 'ai.emoji', keywords: 'kw.aiEmoji' },
+  { id: 'avatar', section: 'profile', label: 'profile.avatar', keywords: 'kw.avatar' },
   { id: 'account', section: 'profile', label: 'profile.account', keywords: 'kw.account' },
   { id: 'locale', section: 'profile', label: 'profile.locale', keywords: 'kw.locale' },
   { id: 'email-change', section: 'profile', label: 'profile.emailChange', keywords: 'kw.email' },
   { id: 'password-change', section: 'profile', label: 'profile.password', keywords: 'kw.password' },
-  { id: 'data', section: 'profile', label: 'profile.data', keywords: 'kw.data' },
+  { id: 'data', section: 'profile', label: 'profile.exportTitle', keywords: 'kw.data' },
+  { id: 'import', section: 'profile', label: 'profile.importTitle', keywords: 'kw.data' },
   { id: 'danger', section: 'profile', label: 'profile.danger', keywords: 'kw.danger' },
 ];
 

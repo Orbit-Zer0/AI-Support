@@ -59,6 +59,7 @@ function syncProfileControls() {
   }
 
   fillProfileSelects();
+  applyAvatar();
 }
 
 async function saveLocale(patch) {

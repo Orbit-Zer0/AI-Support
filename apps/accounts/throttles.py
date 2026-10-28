@@ -17,3 +17,7 @@ class ExportThrottle(UserRateThrottle):
 
 class ImportThrottle(UserRateThrottle):
     scope = 'import'
+
+class AvatarThrottle(UserRateThrottle):
+    scope = 'avatar'
+    scope = 'import'

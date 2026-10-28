@@ -2,6 +2,7 @@ from django.urls import path
 
 from .account_views import (
     AccountView,
+    AvatarView,
     ChangeEmailView,
     ChangePasswordView,
     DeleteAccountView,
@@ -34,6 +35,7 @@ urlpatterns = [
     path('password/reset/', ResetPasswordView.as_view(), name='password-reset'),
 
     path('account/', AccountView.as_view(), name='account'),
+    path('account/avatar/', AvatarView.as_view(), name='account-avatar'),
     path('account/email/', ChangeEmailView.as_view(), name='account-email'),
     path('account/password/', ChangePasswordView.as_view(), name='account-password'),
     path('account/export/', ExportDataView.as_view(), name='account-export'),

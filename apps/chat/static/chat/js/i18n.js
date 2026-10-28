@@ -219,6 +219,15 @@ const STRINGS = {
         'err.import_unsupported': 'Эта версия файла не поддерживается.',
         'err.import_too_many': 'В файле слишком много диалогов (максимум 200).',
         'err.import_too_large': 'Файл слишком большой (максимум 5 МБ).',
+        'profile.avatar': 'Фото профиля',
+        'profile.avatar.upload': 'Загрузить фото',
+        'profile.avatar.remove': 'Удалить фото',
+        'profile.avatar.note': 'JPG, PNG или WebP до 2 МБ. Фото обрезается до квадрата и сжимается, а метаданные (например, геолокация) удаляются.',
+        'err.avatar_required': 'Выбери файл с фото.',
+        'err.avatar_invalid': 'Файл не подходит: нужна картинка JPG, PNG или WebP.',
+        'err.avatar_too_large': 'Файл слишком большой (максимум 2 МБ).',
+        'err.avatar_dimensions': 'Изображение слишком большое по размерам (максимум 25 мегапикселей).',
+        'kw.avatar': 'фото аватарка картинка изображение профиль avatar photo picture',
     },
 
     en: {
@@ -441,6 +450,15 @@ const STRINGS = {
         'err.import_unsupported': 'This version of the file is not supported.',
         'err.import_too_many': 'The file has too many conversations (maximum 200).',
         'err.import_too_large': 'The file is too large (maximum 5 MB).',
+        'profile.avatar': 'Profile photo',
+        'profile.avatar.upload': 'Upload photo',
+        'profile.avatar.remove': 'Remove photo',
+        'profile.avatar.note': 'JPG, PNG or WebP up to 2 MB. The photo is cropped to a square and compressed, and metadata (such as location) is removed.',
+        'err.avatar_required': 'Choose a photo file.',
+        'err.avatar_invalid': "This file doesn't work: use a JPG, PNG or WebP image.",
+        'err.avatar_too_large': 'The file is too large (maximum 2 MB).',
+        'err.avatar_dimensions': 'The image is too large in size (maximum 25 megapixels).',
+        'kw.avatar': 'photo avatar picture image profile',
     },
 
     ky: {
@@ -663,6 +681,15 @@ const STRINGS = {
         'err.import_unsupported': 'Файлдын бул версиясы колдоого алынбайт.',
         'err.import_too_many': 'Файлда диалогдор өтө көп (эң көбү 200).',
         'err.import_too_large': 'Файл өтө чоң (эң көбү 5 МБ).',
+        'profile.avatar': 'Профиль сүрөтү',
+        'profile.avatar.upload': 'Сүрөт жүктөө',
+        'profile.avatar.remove': 'Сүрөттү өчүрүү',
+        'profile.avatar.note': 'JPG, PNG же WebP, 2 МБга чейин. Сүрөт чарчыга кесилет жана кысылат, метаберилиштер (мисалы, жайгашкан жер) өчүрүлөт.',
+        'err.avatar_required': 'Сүрөт файлын танда.',
+        'err.avatar_invalid': 'Файл жарабайт: JPG, PNG же WebP сүрөтү керек.',
+        'err.avatar_too_large': 'Файл өтө чоң (эң көбү 2 МБ).',
+        'err.avatar_dimensions': 'Сүрөттүн өлчөмү өтө чоң (эң көбү 25 мегапиксель).',
+        'kw.avatar': 'сүрөт аватар профиль photo avatar picture',
     },
 };
 

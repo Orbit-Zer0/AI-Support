@@ -3,6 +3,7 @@ import logging
 from django.db import transaction
 from django.http import HttpResponse
 from rest_framework.authtoken.models import Token
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,7 @@ from .account_serializers import (
     ChangePasswordSerializer,
     DeleteAccountSerializer,
 )
+from .avatars import MAX_AVATAR_BYTES, AvatarError, process_avatar
 from .data_transfer import (
     MAX_IMPORT_BYTES,
     ImportDataError,
@@ -22,10 +24,19 @@ from .data_transfer import (
 )
 from .emails import send_verification_email
 from .models import UserProfile
-from .throttles import ExportThrottle, ImportThrottle, SensitiveActionThrottle
+from .throttles import AvatarThrottle, ExportThrottle, ImportThrottle, SensitiveActionThrottle
 from .views import account_data
 
 logger = logging.getLogger(__name__)
+
+AVATAR_FORM_OVERHEAD = 64 * 1024
+
+AVATAR_MESSAGES = {
+    'avatar_required': 'No image was provided.',
+    'avatar_invalid': 'The file is not a supported image (JPEG, PNG or WebP).',
+    'avatar_too_large': 'The image file is too large.',
+    'avatar_dimensions': 'The image dimensions are too large.',
+}
 
 
 def get_or_create_profile(user):
@@ -40,6 +51,10 @@ def _content_length(request):
         return int(request.META.get('CONTENT_LENGTH') or 0)
     except (TypeError, ValueError):
         return 0
+
+
+def _avatar_error(code, status):
+    return Response({'error': AVATAR_MESSAGES[code], 'code': code}, status=status)
 
 
 class AccountView(APIView):
@@ -61,6 +76,37 @@ class AccountView(APIView):
         if changed:
             profile.save(update_fields=changed)
         return Response(account_data(request.user))
+
+
+class AvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [AvatarThrottle]
+    parser_classes = [MultiPartParser]
+
+    def post(self, request):
+        if _content_length(request) > MAX_AVATAR_BYTES + AVATAR_FORM_OVERHEAD:
+            return _avatar_error('avatar_too_large', 413)
+
+        upload = request.FILES.get('avatar')
+        if upload is None:
+            return _avatar_error('avatar_required', 400)
+
+        try:
+            content = process_avatar(upload)
+        except AvatarError as exc:
+            return _avatar_error(exc.code, 400)
+
+        profile = get_or_create_profile(request.user)
+        if profile.avatar:
+            profile.avatar.delete(save=False)
+        profile.avatar.save(content.name, content, save=True)
+        return Response({'avatar_url': profile.avatar.url})
+
+    def delete(self, request):
+        profile = getattr(request.user, 'profile', None)
+        if profile is not None and profile.avatar:
+            profile.avatar.delete(save=True)
+        return Response(status=204)
 
 
 class ChangePasswordView(APIView):
@@ -179,6 +225,13 @@ class DeleteAccountView(APIView):
                 status=403,
             )
 
+        profile = getattr(user, 'profile', None)
+        avatar_storage = avatar_name = None
+        if profile is not None and profile.avatar:
+            avatar_storage, avatar_name = profile.avatar.storage, profile.avatar.name
+
         with transaction.atomic():
             user.delete()
+        if avatar_name:
+            avatar_storage.delete(avatar_name)
         return Response(status=204)
