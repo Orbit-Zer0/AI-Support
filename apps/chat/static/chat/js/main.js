@@ -92,6 +92,7 @@ $('notice-dialog').addEventListener('close', () => {
 
 
 $('send').addEventListener('click', sendFromInput);
+$('stop').addEventListener('click', stopGeneration);
 
 $('input').addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {

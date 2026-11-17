@@ -228,6 +228,15 @@ const STRINGS = {
         'err.avatar_too_large': 'Файл слишком большой (максимум 2 МБ).',
         'err.avatar_dimensions': 'Изображение слишком большое по размерам (максимум 25 мегапикселей).',
         'kw.avatar': 'фото аватарка картинка изображение профиль avatar photo picture',
+        'btn.stop': 'Остановить',
+        'chat.thinking': 'Думает… {seconds} с',
+        'chat.thinkingShort': 'Думает…',
+        'meta.thought': 'думал {seconds} с',
+        'meta.total': 'ответ за {seconds} с',
+        'meta.stopped': 'остановлено',
+        'meta.tooltip': 'Время от получения запроса сервером до первого слова ответа и до конца ответа. Включает ожидание модели.',
+        'err.stream_failed': 'Ответ прервался. Показана полученная часть.',
+        'err.stopped': 'Остановлено до начала ответа.',
     },
 
     en: {
@@ -459,6 +468,15 @@ const STRINGS = {
         'err.avatar_too_large': 'The file is too large (maximum 2 MB).',
         'err.avatar_dimensions': 'The image is too large in size (maximum 25 megapixels).',
         'kw.avatar': 'photo avatar picture image profile',
+        'btn.stop': 'Stop',
+        'chat.thinking': 'Thinking… {seconds} s',
+        'chat.thinkingShort': 'Thinking…',
+        'meta.thought': 'thought for {seconds} s',
+        'meta.total': 'replied in {seconds} s',
+        'meta.stopped': 'stopped',
+        'meta.tooltip': 'Time from the server receiving your message to the first word of the reply and to the end of it. Includes waiting for the model.',
+        'err.stream_failed': 'The reply was interrupted. The part received so far is shown.',
+        'err.stopped': 'Stopped before the reply started.',
     },
 
     ky: {
@@ -690,6 +708,15 @@ const STRINGS = {
         'err.avatar_too_large': 'Файл өтө чоң (эң көбү 2 МБ).',
         'err.avatar_dimensions': 'Сүрөттүн өлчөмү өтө чоң (эң көбү 25 мегапиксель).',
         'kw.avatar': 'сүрөт аватар профиль photo avatar picture',
+        'btn.stop': 'Токтотуу',
+        'chat.thinking': 'Ойлонууда… {seconds} сек',
+        'chat.thinkingShort': 'Ойлонууда…',
+        'meta.thought': '{seconds} сек ойлонду',
+        'meta.total': '{seconds} сек ичинде жооп берди',
+        'meta.stopped': 'токтотулду',
+        'meta.tooltip': 'Сервер билдирүүнү алгандан жоопТун биринчи сөзүнө чейинки жана жооптун аягына чейинки убакыт. Моделди күтүүнү да камтыйт.',
+        'err.stream_failed': 'Жооп үзүлдү. Алынган бөлүгү көрсөтүлдү.',
+        'err.stopped': 'Жооп башталганга чейин токтотулду.',
     },
 };
 

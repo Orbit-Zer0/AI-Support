@@ -32,5 +32,9 @@ class Message(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
 
+    first_token_ms = models.PositiveIntegerField(null=True, blank=True)
+    duration_ms = models.PositiveIntegerField(null=True, blank=True)
+    interrupted = models.BooleanField(default=False)
+
     class Meta:
         ordering = ['id']

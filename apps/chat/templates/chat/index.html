@@ -7,6 +7,7 @@
   <title>AI Support</title>
   <link rel="stylesheet" href="{% static 'chat/css/style.css' %}">
   <link rel="stylesheet" href="{% static 'chat/css/profile.css' %}">
+  <link rel="stylesheet" href="{% static 'chat/css/stream.css' %}">
   <link rel="stylesheet" href="{% static 'chat/css/accounts.css' %}">
   <script src="{% static 'chat/js/appearance.js' %}"></script>
 </head>
@@ -193,6 +194,7 @@
         <div class="composer">
           <textarea id="input" rows="1" maxlength="4000" data-i18n-placeholder="placeholder.message"></textarea>
           <button type="button" id="send" data-i18n="btn.send"></button>
+          <button type="button" id="stop" class="stop-btn" hidden data-i18n="btn.stop"></button>
         </div>
         <p class="disclaimer" data-i18n="disclaimer.text"></p>
         <p class="contact" id="contact-line">

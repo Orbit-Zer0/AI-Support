@@ -1,6 +1,3 @@
-from apps.accounts.user_settings import get_user_settings
-from .styles import build_style_block
-
 import logging
 import re
 from functools import lru_cache
@@ -9,9 +6,11 @@ from django.conf import settings
 from google import genai
 from google.genai import types
 
+from apps.accounts.user_settings import get_user_settings
 from apps.crisis.services import build_crisis_block_for_user
 
 from .prompts import SUMMARY_PROMPT, TITLE_PROMPT, build_system_prompt
+from .styles import build_style_block
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +53,7 @@ def _default_language_name(user):
     language = getattr(profile, 'language', None)
     return language.name if language else 'English'
 
+
 def _style_block_for(user):
     try:
         return build_style_block(get_user_settings(user)['ai_style'])
@@ -61,13 +61,13 @@ def _style_block_for(user):
         logger.exception('Failed to load AI style settings')
         return build_style_block(None)
 
-def get_ai_response(message_history: list[dict], new_message: str, user) -> str:
+
+def _chat_inputs(message_history, user):
     system_prompt = build_system_prompt(
         crisis_block=build_crisis_block_for_user(user),
         default_language=_default_language_name(user),
         style_block=_style_block_for(user),
     )
-
     gemini_history = [
         types.Content(
             role=msg["role"] if msg["role"] == "user" else "model",
@@ -75,6 +75,11 @@ def get_ai_response(message_history: list[dict], new_message: str, user) -> str:
         )
         for msg in message_history
     ]
+    return system_prompt, gemini_history
+
+
+def get_ai_response(message_history: list[dict], new_message: str, user) -> str:
+    system_prompt, gemini_history = _chat_inputs(message_history, user)
 
     def run(model):
         chat = _get_client().chats.create(
@@ -85,6 +90,36 @@ def get_ai_response(message_history: list[dict], new_message: str, user) -> str:
         return chat.send_message(new_message).text
 
     return _run_with_fallback(run)
+
+
+def stream_ai_response(message_history: list[dict], new_message: str, user):
+    system_prompt, gemini_history = _chat_inputs(message_history, user)
+
+    last_error = None
+    for model in _models_to_try():
+        started = False
+        try:
+            chat = _get_client().chats.create(
+                model=model,
+                history=gemini_history,
+                config=types.GenerateContentConfig(system_instruction=system_prompt),
+            )
+            for chunk in chat.send_message_stream(new_message):
+                text = chunk.text
+                if text:
+                    started = True
+                    yield text
+            return
+        except Exception as exc:
+            code = getattr(exc, 'code', None)
+            if started or code not in RETRYABLE_CODES:
+                raise
+            logger.warning('Model %s failed with code %s, trying the next one', model, code)
+            last_error = exc
+
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError('No Gemini model is configured')
 
 
 def summarize_conversation(previous_summary: str, messages: list[dict]) -> str:

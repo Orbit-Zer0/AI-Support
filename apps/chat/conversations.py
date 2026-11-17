@@ -87,9 +87,13 @@ class ConversationDetailView(APIView):
             .order_by('id').values_list('content', flat=True).first()
         )
 
+        rows = conversation.messages.order_by('id').values(
+            'id', 'role', 'content', 'created_at',
+            'first_token_ms', 'duration_ms', 'interrupted',
+        )
         messages = []
         previous_user_was_crisis = False
-        for m in conversation.messages.order_by('id').values('id', 'role', 'content'):
+        for m in rows:
             if m['role'] == 'user':
                 previous_user_was_crisis = detect_crisis(m['content'])
                 crisis = False
@@ -100,6 +104,10 @@ class ConversationDetailView(APIView):
                 'role': m['role'],
                 'content': m['content'],
                 'crisis': crisis,
+                'created_at': m['created_at'].isoformat(),
+                'first_token_ms': m['first_token_ms'],
+                'duration_ms': m['duration_ms'],
+                'interrupted': m['interrupted'],
             })
         return Response({
             'id': conversation.id,
